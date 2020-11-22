@@ -7,7 +7,8 @@ crossScalaVersions := Seq("2.12.12", "2.13.3")
 
 
 resolvers += Resolver.sonatypeRepo("snapshots")
-
+resolvers += Resolver.bintrayIvyRepo("eed3si9n", "sbt-plugins")
+resolvers += "Flyway" at "https://flywaydb.org/repo"
 
 val CatsVersion = "2.2.0"
 val CirceVersion = "0.13.0"
@@ -98,10 +99,14 @@ dependencyOverrides += "org.slf4j" % "slf4j-api" % Slf4jVersion
 addCompilerPlugin(
   ("org.typelevel" %% "kind-projector" % KindProjectorVersion).cross(CrossVersion.full),
 )
-
-enablePlugins(ScalafmtPlugin, JavaAppPackaging, GhpagesPlugin, MicrositesPlugin, TutPlugin, DockerPlugin)
+enablePlugins(ScalafmtPlugin, JavaAppPackaging, GhpagesPlugin, MicrositesPlugin, TutPlugin, DockerPlugin, AssemblyPlugin)
 
 // Note: This fixes error with sbt run not loading config properly
 fork in run := true
 
 dockerExposedPorts ++= Seq(8080)
+
+assemblyMergeStrategy in assembly := {
+  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+  case _ => MergeStrategy.first
+}

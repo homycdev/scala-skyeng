@@ -17,3 +17,5 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-ghpages" % "0.6.3")
 
 // Easily manage scalac settings across scala versions with this:
 addSbtPlugin("io.github.davidgregory084" % "sbt-tpolecat" % "0.1.15")
+
+addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.15.0")
