@@ -1,4 +1,0 @@
-[error] /home/hamy/IdeaProjects/SCP2020/project/Dependencies.scala:93:66: ';' expected but ',' found.
-[error]     val `circe-config`   = "io.circe" %% "circe-config" % "0.8.0",
-[error]                                                                  ^
-[error] one error found
