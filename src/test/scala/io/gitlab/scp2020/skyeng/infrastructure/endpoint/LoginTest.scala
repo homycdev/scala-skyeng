@@ -3,7 +3,7 @@ package io.gitlab.scp2020.skyeng.infrastructure.endpoint
 import cats.data.Kleisli
 import cats.effect.IO
 import io.gitlab.scp2020.skyeng.domain.authentication.{LoginRequest, SignupRequest}
-import io.gitlab.scp2020.skyeng.domain.users.{Role, User}}
+import io.gitlab.scp2020.skyeng.domain.users.{Role, User}
 import org.http4s.circe.{jsonEncoderOf, jsonOf}
 import org.http4s.client.dsl.Http4sClientDsl
 import org.http4s.{EntityDecoder, EntityEncoder, HttpApp, Request, Response}
