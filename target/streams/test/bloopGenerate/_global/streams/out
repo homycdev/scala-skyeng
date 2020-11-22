@@ -1,0 +1,4 @@
+[debug] [scp2020-test] Classpath dependencies List()
+[debug] [scp2020-test] Dependencies from configurations List(scp2020)
+[debug] Bloop wrote the configuration of project 'scp2020-test' to '/home/hamy/IdeaProjects/SCP2020/.bloop/scp2020-test.json'
+[success] Generated .bloop/scp2020-test.json
