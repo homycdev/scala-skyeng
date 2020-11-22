@@ -67,3 +67,5 @@ Osrc/test/scala/io/gitlab/scp2020/skyeng/infrastructure/endpoint/LoginTest.scala
 Wsrc/test/scala/io/gitlab/scp2020/skyeng/infrastructure/endpoint/UserEndpointsSpec.scala,0/e/0ec2c3d9219989e59367b95caea0d009087247cf
 ¢
 rsrc/main/scala/io/gitlab/scp2020/skyeng/infrastructure/repository/inmemory/UserRepositoryInMemoryInterpreter.scala,c/6/c6fb1aa6890a6a4be42a195f4de3ab0ca3b3586c
+9
+	README.md,8/e/8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
