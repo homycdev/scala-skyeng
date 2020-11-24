@@ -2,10 +2,11 @@ CREATE TABLE "users"
 (
     "id"         serial4 PRIMARY KEY,
     "user_name"  VARCHAR not null,
-    "first_name" VARCHAR NOT NULL,
-    "last_name"  VARCHAR NOT NULL,
-    "email"      VARCHAR NOT NULL,
+    "first_name" VARCHAR ,
+    "last_name"  VARCHAR ,
+    "email"      VARCHAR ,
     "hash"       VARCHAR not null,
+    "phone"      varchar,
     "role"       varchar not null default 'Student',
 
     UNIQUE (id)

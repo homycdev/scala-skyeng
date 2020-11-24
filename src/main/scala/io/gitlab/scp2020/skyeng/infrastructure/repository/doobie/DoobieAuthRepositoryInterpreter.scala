@@ -36,7 +36,7 @@ private object AuthSQL {
       .query[(String, Long)]
 }
 
-class DoobieAuthRepositoryInterpreter[F[_] : Bracket[?[_], Throwable], A](
+class DoobieAuthRepositoryInterpreter[F[_] : Bracket[*[_], Throwable], A](
                                                                            val key: MacSigningKey[A],
                                                                            val xa: Transactor[F],
                                                                          )(implicit
@@ -70,19 +70,19 @@ class DoobieAuthRepositoryInterpreter[F[_] : Bracket[?[_], Throwable], A](
       .option
       .transact(xa))
       .semiflatMap {
-      case (jwtStringify, identity) =>
-        JWTMacImpure.verifyAndParse(jwtStringify, key) match {
-          case Left(err) => err.raiseError[F, AugmentedJWT[A, Long]]
-          case Right(jwt) => AugmentedJWT(id, jwt, identity, Instant.now(), Some(Instant.now())).pure[F]  // TODO: remove temporary Instant.now()
-        }
-    }
+        case (jwtStringify, identity) =>
+          JWTMacImpure.verifyAndParse(jwtStringify, key) match {
+            case Left(err) => err.raiseError[F, AugmentedJWT[A, Long]]
+            case Right(jwt) => AugmentedJWT(id, jwt, identity, Instant.now(), Some(Instant.now())).pure[F] // TODO: remove temporary Instant.now()
+          }
+      }
 }
 
 
 object DoobieAuthRepositoryInterpreter {
-  def apply[F[_]: Bracket[?[_], Throwable], A](key: MacSigningKey[A], xa: Transactor[F])(implicit
-                                                                                         hs: JWSSerializer[JWSMacHeader[A]],
-                                                                                         s: JWSMacCV[MacErrorM, A],
+  def apply[F[_] : Bracket[*[_], Throwable], A](key: MacSigningKey[A], xa: Transactor[F])(implicit
+                                                                                          hs: JWSSerializer[JWSMacHeader[A]],
+                                                                                          s: JWSMacCV[MacErrorM, A],
   ): DoobieAuthRepositoryInterpreter[F, A] =
     new DoobieAuthRepositoryInterpreter(key, xa)
 }

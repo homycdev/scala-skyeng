@@ -1,7 +1,7 @@
 package io.gitlab.scp2020.skyeng.config
 
-import cats.syntax.functor._
 import cats.effect.{Async, Blocker, ContextShift, Resource, Sync}
+import cats.syntax.functor._
 import doobie.hikari.HikariTransactor
 import org.flywaydb.core.Flyway
 

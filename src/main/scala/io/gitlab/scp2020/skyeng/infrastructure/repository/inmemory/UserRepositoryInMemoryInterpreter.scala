@@ -11,7 +11,7 @@ import tsec.authentication.IdentityStore
 
 import scala.collection.concurrent.TrieMap
 
-class UserRepositoryInMemoryInterpreter[F[_]: Applicative]
+class UserRepositoryInMemoryInterpreter[F[_] : Applicative]
   extends UserRepositoryAlgebra[F]
     with IdentityStore[F, Long, User] {
   private val cache = new TrieMap[Long, User]
@@ -54,7 +54,7 @@ class UserRepositoryInMemoryInterpreter[F[_]: Applicative]
 }
 
 object UserRepositoryInMemoryInterpreter {
-  def apply[F[_]: Applicative]() =
+  def apply[F[_] : Applicative]() =
     new UserRepositoryInMemoryInterpreter[F]
 }
 

@@ -1,9 +1,8 @@
 package io.gitlab.scp2020.skyeng.domain.users
 
 
+import cats.{Functor, Monad}
 import cats.data._
-import cats.Functor
-import cats.Monad
 import cats.syntax.functor._
 import io.gitlab.scp2020.skyeng.domain.{UserAlreadyExistsError, UserNotFoundError}
 

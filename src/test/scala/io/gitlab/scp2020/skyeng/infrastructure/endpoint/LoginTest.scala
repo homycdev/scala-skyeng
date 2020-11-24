@@ -2,15 +2,15 @@ package io.gitlab.scp2020.skyeng.infrastructure.endpoint
 
 import cats.data.Kleisli
 import cats.effect.IO
+import io.circe.generic.auto._
 import io.gitlab.scp2020.skyeng.domain.authentication.{LoginRequest, SignupRequest}
 import io.gitlab.scp2020.skyeng.domain.users.{Role, User}
 import org.http4s.circe.{jsonEncoderOf, jsonOf}
 import org.http4s.client.dsl.Http4sClientDsl
-import org.http4s.{EntityDecoder, EntityEncoder, HttpApp, Request, Response}
-import org.http4s.implicits._
-import org.http4s.headers.Authorization
-import io.circe.generic.auto._
 import org.http4s.dsl.Http4sDsl
+import org.http4s.headers.Authorization
+import org.http4s.implicits._
+import org.http4s._
 
 trait LoginTest extends Http4sClientDsl[IO] with Http4sDsl[IO] {
   implicit val userEnc: EntityEncoder[IO, User] = jsonEncoderOf
