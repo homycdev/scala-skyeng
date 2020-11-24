@@ -47,15 +47,21 @@ You can observe the scheme in the following [link](https://drive.google.com/file
 
 
 ## How to run?
-`todo3: place detailed running instructions`
-Startup sbt:
+
+Run following bash scripts to run the server application:
+
+1. Built the project:
 ```
-sbt --java-home {your.java.11.location}
+./step1_build_jars.sh
 ```
 
-Once app is loaded, start the app:
+Once app is loaded, run second step to run the app:
 ```
-> ~reStart
+./step2_run_apps.sh
+```
+then 
+```
+docker-compose logs -f
 ```
 
 ## Testing

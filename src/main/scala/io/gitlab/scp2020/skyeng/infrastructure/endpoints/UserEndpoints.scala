@@ -6,20 +6,18 @@ import cats.effect.Sync
 import cats.syntax.all._
 import io.circe.generic.auto._
 import io.circe.syntax._
+import io.gitlab.scp2020.skyeng.domain.authentication.{Auth, LoginRequest, SignupRequest}
+import io.gitlab.scp2020.skyeng.domain.users.{User, UserService}
+import io.gitlab.scp2020.skyeng.domain.{UserAlreadyExistsError, UserAuthenticationFailedError, UserNotFoundError}
+import io.gitlab.scp2020.skyeng.infrastructure.endpoint.{AuthEndpoint, AuthService}
+import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.Pagination.{OptionalOffsetMatcher, OptionalPageSizeMatcher}
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{EntityDecoder, HttpRoutes}
-
 import tsec.authentication._
 import tsec.common.Verified
 import tsec.jwt.algorithms.JWTMacAlgo
 import tsec.passwordhashers.{PasswordHash, PasswordHasher}
-
-import io.gitlab.scp2020.skyeng.domain.{UserAlreadyExistsError, UserAuthenticationFailedError, UserNotFoundError}
-import io.gitlab.scp2020.skyeng.domain.authentication.{Auth, LoginRequest, SignupRequest}
-import io.gitlab.scp2020.skyeng.domain.users.{User, UserService}
-import io.gitlab.scp2020.skyeng.infrastructure.endpoint.{AuthEndpoint, AuthService}
-import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.Pagination.{OptionalOffsetMatcher, OptionalPageSizeMatcher}
 
 class UserEndpoints[F[_] : Sync, A, Auth: JWTMacAlgo] extends Http4sDsl[F] {
 
@@ -135,8 +133,7 @@ class UserEndpoints[F[_] : Sync, A, Auth: JWTMacAlgo] extends Http4sDsl[F] {
 
     val unauthEndpoints =
       loginEndpoint(userService, cryptService, auth.authenticator) <+>
-            signupEndpoint(userService, cryptService)
-
+        signupEndpoint(userService, cryptService)
     unauthEndpoints <+> auth.liftService(authEndpoints)
   }
 }

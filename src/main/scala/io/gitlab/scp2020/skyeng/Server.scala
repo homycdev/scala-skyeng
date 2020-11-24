@@ -1,18 +1,17 @@
 package io.gitlab.scp2020.skyeng
 
 
-import cats.effect.{ConcurrentEffect, ContextShift, Resource, Timer}
+import cats.effect.{ConcurrentEffect, ContextShift, Resource, Timer, _}
 import doobie.util.ExecutionContexts
 import io.circe.config.parser
 import io.gitlab.scp2020.skyeng.config.{DatabaseConfig, SkyEngConfig}
-import org.http4s.server.{Router, Server => H4Server}
-import cats.effect._
 import io.gitlab.scp2020.skyeng.domain.authentication.Auth
 import io.gitlab.scp2020.skyeng.domain.users.{UserService, UserValidationInterpreter}
 import io.gitlab.scp2020.skyeng.infrastructure.endpoints.UserEndpoints
 import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.{DoobieAuthRepositoryInterpreter, DoobieUserRepositoryInterpreter}
 import org.http4s.implicits.http4sKleisliResponseSyntaxOptionT
 import org.http4s.server.blaze.BlazeServerBuilder
+import org.http4s.server.{Router, Server => H4Server}
 import tsec.authentication.SecuredRequestHandler
 import tsec.mac.jca.HMACSHA256
 import tsec.passwordhashers.jca.BCrypt
@@ -20,8 +19,8 @@ import tsec.passwordhashers.jca.BCrypt
 
 object Server extends IOApp {
 
-  def createServer[F[_]: ContextShift: ConcurrentEffect: Timer]: Resource[F, H4Server[F]] =
-    for{
+  def createServer[F[_] : ContextShift : ConcurrentEffect : Timer]: Resource[F, H4Server[F]] =
+    for {
       // Configs load
       conf <- Resource.liftF(parser.decodePathF[F, SkyEngConfig]("skyeng"))
       serverEc <- ExecutionContexts.cachedThreadPool[F]
@@ -40,14 +39,13 @@ object Server extends IOApp {
       // Services init
       userService = UserService[F](userRepo, userValidation)
 
-
-      // TODO implement authenticator and routeAuth
+      // Authenticator
       authenticator = Auth.jwtAuthenticator[F, HMACSHA256](key, authRepo, userRepo)
       routeAuth = SecuredRequestHandler(authenticator)
 
       httpApp = Router(
         "/users" -> UserEndpoints
-          .endpoints[F,BCrypt,HMACSHA256](userService, BCrypt.syncPasswordHasher[F], routeAuth)
+          .endpoints[F, BCrypt, HMACSHA256](userService, BCrypt.syncPasswordHasher[F], routeAuth)
       ).orNotFound
 
 

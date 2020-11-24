@@ -1,4 +1,5 @@
 package io.gitlab.scp2020.skyeng.domain.users
+
 import cats.data.OptionT
 
 trait UserRepositoryAlgebra[F[_]] {

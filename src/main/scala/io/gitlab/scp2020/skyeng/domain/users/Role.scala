@@ -1,4 +1,5 @@
 package io.gitlab.scp2020.skyeng.domain.users
+
 import cats._
 import tsec.authorization.{AuthGroup, SimpleAuthEnum}
 
@@ -9,7 +10,7 @@ object Role extends SimpleAuthEnum[Role, String] {
   val Student: Role = Role("Customer")
   val Teacher: Role = Role("Teacher")
 
-  override val values: AuthGroup[Role] = AuthGroup(Admin, Student,Teacher)
+  override val values: AuthGroup[Role] = AuthGroup(Admin, Student, Teacher)
 
   override def getRepr(t: Role): String = t.roleRepr
 
