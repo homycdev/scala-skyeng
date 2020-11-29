@@ -7,7 +7,7 @@ final case class Role(roleRepr: String)
 
 object Role extends SimpleAuthEnum[Role, String] {
   val Admin: Role = Role("Admin")
-  val Student: Role = Role("Customer")
+  val Student: Role = Role("Student")
   val Teacher: Role = Role("Teacher")
 
   override val values: AuthGroup[Role] = AuthGroup(Admin, Student, Teacher)

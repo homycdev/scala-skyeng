@@ -27,8 +27,9 @@ CREATE TABLE IF NOT EXISTS "user"
     "email"        VARCHAR(255),
     "hash"         VARCHAR   NOT NULL,
     "phone_number" VARCHAR(12),
-    "role"         role_type NOT NULL,
-    "created"      TIMESTAMP
+    "role"         role_type NOT NULL default 'student',
+    "created"      TIMESTAMP,
+    "user_name"    varchar(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS "jwt"
@@ -44,7 +45,7 @@ DO
 $$
     BEGIN
         IF NOT EXISTS(SELECT 1 FROM pg_type WHERE typname = 'qualification_type') THEN
-            CREATE TYPE "qualification_type" AS ENUM ('russian_speaking', 'native_speaker');
+            CREATE TYPE "qualification_type" AS ENUM ('not_native_speaker', 'native_speaker');
         END IF;
     END
 $$;

@@ -9,6 +9,8 @@ import doobie.{Query0, Transactor, Update0}
 import io.gitlab.scp2020.skyeng.domain.users.{User, UserRepositoryAlgebra}
 import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.SQLPagination.paginate
 import tsec.authentication.IdentityStore
+//import doobie.implicits.legacy.instant._
+//import doobie.implicits.legacy.localdate._
 
 private object UserSQL {
   // H2 does not support JSON data type.
@@ -17,40 +19,40 @@ private object UserSQL {
 
   def insert(user: User): Update0 =
     sql"""
-    INSERT INTO USERS (USER_NAME, FIRST_NAME, LAST_NAME, EMAIL, HASH, PHONE, ROLE)
+    INSERT INTO USER (USER_NAME, FIRST_NAME, LAST_NAME, EMAIL, HASH, phone_number, ROLE)
     VALUES (${user.userName}, ${user.firstName}, ${user.lastName}, ${user.email}, ${user.hash}, ${user.phone}, ${user.role})
   """.update
 
   def update(user: User, id: Long): Update0 =
     sql"""
-    UPDATE USERS
+    UPDATE USER
     SET FIRST_NAME = ${user.firstName}, LAST_NAME = ${user.lastName},
-        EMAIL = ${user.email}, HASH = ${user.hash}, PHONE = ${user.phone}, ROLE = ${user.role}
+        EMAIL = ${user.email}, HASH = ${user.hash}, phone_number = ${user.phone}, ROLE = ${user.role}
     WHERE ID = $id
   """.update
 
   def select(userId: Long): Query0[User] =
     sql"""
-    SELECT USER_NAME, FIRST_NAME, LAST_NAME, EMAIL, HASH, PHONE, ID, ROLE
-    FROM USERS
+    SELECT USER_NAME, FIRST_NAME, LAST_NAME, EMAIL, HASH, phone_number, ID, ROLE
+    FROM USER
     WHERE ID = $userId
   """.query
 
   def byUserName(userName: String): Query0[User] = sql"""
-    SELECT USER_NAME, FIRST_NAME, LAST_NAME, EMAIL, HASH, PHONE, ID, ROLE
-    FROM USERS
+    SELECT USER_NAME, FIRST_NAME, LAST_NAME, EMAIL, HASH, phone_number, ID, ROLE
+    FROM USER
     WHERE USER_NAME = $userName
   """.query[User]
 
   def delete(userId: Long): Update0 =
     sql"""
-    DELETE FROM USERS WHERE ID = $userId
+    DELETE FROM USER WHERE ID = $userId
   """.update
 
   val selectAll: Query0[User] =
     sql"""
-    SELECT USER_NAME, FIRST_NAME, LAST_NAME, EMAIL, HASH, PHONE, ID, ROLE
-    FROM USERS
+    SELECT USER_NAME, FIRST_NAME, LAST_NAME, EMAIL, HASH, phone_number, ID, ROLE
+    FROM USER
   """.query
 }
 

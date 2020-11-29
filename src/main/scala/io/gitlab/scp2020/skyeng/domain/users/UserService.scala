@@ -1,9 +1,9 @@
 package io.gitlab.scp2020.skyeng.domain.users
 
 
-import cats.{Functor, Monad}
 import cats.data._
 import cats.syntax.functor._
+import cats.{Functor, Monad}
 import io.gitlab.scp2020.skyeng.domain.{UserAlreadyExistsError, UserNotFoundError}
 
 class UserService[F[_]](userRepo: UserRepositoryAlgebra[F], validation: UserValidationAlgebra[F]) {
