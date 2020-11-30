@@ -24,7 +24,7 @@ DO
 $$
     BEGIN
         IF NOT EXISTS(SELECT 1 FROM pg_type WHERE typname = 'level_type') THEN
-            CREATE TYPE "level_type" AS ENUM ('beginner', 'elementary', 'pre-intermediate', 'intermediate', 'upper-intermediate', 'advanced');
+            CREATE TYPE "level_type" AS ENUM ('beginner', 'elementary', 'pre_intermediate', 'intermediate', 'upper_intermediate', 'advanced');
         END IF;
     END
 $$;

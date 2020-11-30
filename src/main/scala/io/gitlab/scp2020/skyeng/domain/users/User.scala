@@ -11,10 +11,8 @@ case class User(
                  hash: String,
                  phone: String,
                  id: Option[Long] = None,
-                 role: Role,
+                 role: Role = Role("Student"),
                )
-
-//TODO Extend as they should be
 
 object User {
   implicit def authRol[F[_]](implicit F: Applicative[F]): AuthorizationInfo[F, Role, User] = {

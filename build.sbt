@@ -47,7 +47,7 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-config" % CirceConfigVersion,
 
   "org.tpolecat" %% "doobie-core" % DoobieVersion,
-  "org.tpolecat" %% "doobie-postgres" % DoobieVersion,
+  "org.tpolecat" %% "doobie-postgres" % "0.9.0",
   "org.tpolecat" %% "doobie-scalatest" % DoobieVersion,
   "org.tpolecat" %% "doobie-hikari" % DoobieVersion,
 
