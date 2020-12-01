@@ -5,7 +5,7 @@ import io.circe.Json
 
 case class Exercise(
                      id: Long,
-                     taskId: Long,
+                     taskId: Option[Long],
                      exerciseType: ExerciseType,
                      content: Json
                    )
