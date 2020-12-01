@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS "class"
     "course_id"     BIGINT REFERENCES "course" (id) ON DELETE CASCADE,
     "type"          VARCHAR(16) NOT NULL,
     "lesson_id"     BIGINT REFERENCES "class" (id) ON DELETE NO ACTION, -- if it's a homework, there should be a lesson for it
-    "difficulty"    level_type  NOT NULL,
+    "difficulty"    VARCHAR(16) NOT NULL,
     "list_position" INT         NOT NULL
 );
 
