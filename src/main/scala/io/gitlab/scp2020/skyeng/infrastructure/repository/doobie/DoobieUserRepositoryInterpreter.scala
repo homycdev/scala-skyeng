@@ -11,16 +11,31 @@ import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.SQLPagination.p
 import tsec.authentication.IdentityStore
 //import doobie.implicits.legacy.instant._
 //import doobie.implicits.legacy.localdate._
+// TODO import java.sql.timestamp everywhere we use timestamp, broteshka :)
+// and date from java.util package
+// Instant, LocalDate, LocalTime, LocalDateTime, OffsetTime, OffsetDateTime and ZonedDateTime from the java.time package
+
 
 private object UserSQL {
   // H2 does not support JSON data type.
-  //  implicit val roleMeta: Meta[Role] =
-  //    Meta[String].imap(decode[Role](_).leftMap(throw _).merge)(_.asJson.toString)
+//  implicit val roleMeta: Meta[Role] =
+//    Meta[String].imap(decode[Role](_).leftMap(throw _).merge)(_.asJson.toString)
+
+  import doobie.implicits.javatime._
 
   def insert(user: User): Update0 =
     sql"""
-    INSERT INTO USER (USER_NAME, FIRST_NAME, LAST_NAME, EMAIL, HASH, phone_number, ROLE)
-    VALUES (${user.userName}, ${user.firstName}, ${user.lastName}, ${user.email}, ${user.hash}, ${user.phone}, ${user.role})
+    INSERT INTO USER (user_name, first_name,last_name,birth_date,gender,email,hash,phone_number,role,created)
+    VALUES (
+    ${user.userName},
+    ${user.firstName},
+    ${user.lastName},
+    ${user.birthDate},
+    ${user.gender},
+    ${user.email},
+    ${user.hash},
+    ${user.phone},
+    ${user.role})
   """.update
 
   def update(user: User, id: Long): Update0 =
@@ -33,13 +48,13 @@ private object UserSQL {
 
   def select(userId: Long): Query0[User] =
     sql"""
-    SELECT USER_NAME, FIRST_NAME, LAST_NAME, EMAIL, HASH, phone_number, ID, ROLE
+    SELECT user_name, first_name,last_name,birth_date,gender,email,hash,phone_number,role,created,id
     FROM USER
     WHERE ID = $userId
-  """.query
+  """.query[User]
 
   def byUserName(userName: String): Query0[User] = sql"""
-    SELECT USER_NAME, FIRST_NAME, LAST_NAME, EMAIL, HASH, phone_number, ID, ROLE
+    SELECT user_name, first_name,last_name,birth_date,gender,email,hash,phone_number,role,created,id
     FROM USER
     WHERE USER_NAME = $userName
   """.query[User]
@@ -49,11 +64,12 @@ private object UserSQL {
     DELETE FROM USER WHERE ID = $userId
   """.update
 
+  // TODO here is the error with params
   val selectAll: Query0[User] =
     sql"""
-    SELECT USER_NAME, FIRST_NAME, LAST_NAME, EMAIL, HASH, phone_number, ID, ROLE
+    SELECT user_name, first_name,last_name,birth_date,gender,email,hash,phone_number,role,created, id
     FROM USER
-  """.query
+  """.query[User]
 }
 
 class DoobieUserRepositoryInterpreter[F[_] : Bracket[*[_], Throwable]](val xa: Transactor[F])

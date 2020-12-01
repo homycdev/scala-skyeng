@@ -1,5 +1,5 @@
-package io.gitlab.scp2020.skyeng.infrastructure.repository.doobie
-
+//package io.gitlab.scp2020.skyeng.infrastructure.repository.doobie
+//
 //import doobie.postgres.syntax._
 //import doobie.postgres.implicits._
 //import cats.data.OptionT
