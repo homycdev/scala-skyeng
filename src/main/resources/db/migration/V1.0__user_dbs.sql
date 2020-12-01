@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS "user"
     "last_name"    VARCHAR(255),
     "birth_date"   DATE,
     "gender"       VARCHAR(16),
-    "email"        VARCHAR(255),
+    "email"        VARCHAR(255) NOT NULL,
     "hash"         VARCHAR      NOT NULL,
     "phone_number" VARCHAR(12),
     "role"         VARCHAR(16)  NOT NULL default 'student',

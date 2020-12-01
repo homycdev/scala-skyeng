@@ -4,9 +4,9 @@ import io.gitlab.scp2020.skyeng.domain.courses.LevelType
 
 case class Class(
                   id: Long,
-                  courseId: Long,
+                  courseId: Option[Long],
                   classType: ClassType,
-                  lessonID: Long,
+                  lessonId: Option[Long],
                   difficulty: LevelType,
                   listPosition: Int,
                 )
