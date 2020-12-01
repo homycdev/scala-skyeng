@@ -9,5 +9,5 @@ case class Transaction(
                         created: LocalDateTime,
                         status: TransactionStatus,
                         change: Int,
-                        reminder: Int,  // TODO: add 'created' field, added vrode, check if not ok, ok?
+                        reminder: Int,
                       )

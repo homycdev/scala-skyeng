@@ -13,9 +13,9 @@ import tsec.common.SecureRandomId
 import tsec.jws.JWSSerializer
 import tsec.jws.mac.{JWSMacCV, JWSMacHeader, JWTMacImpure}
 import tsec.mac.jca.{MacErrorM, MacSigningKey}
-import doobie.implicits.legacy.instant._
 
 private object AuthSQL {
+  import doobie.implicits.javatime._
   implicit val secureRandomIdPut: Put[SecureRandomId] =
     Put[String].contramap((_: Id[SecureRandomId]).widen)
 

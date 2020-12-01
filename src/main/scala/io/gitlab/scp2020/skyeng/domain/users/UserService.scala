@@ -33,8 +33,10 @@ class UserService[F[_]](userRepo: UserRepositoryAlgebra[F], validation: UserVali
       saved <- userRepo.update(user).toRight(UserNotFoundError)
     } yield saved
 
-  def list(pageSize: Int, offset: Int): F[List[User]] =
-    userRepo.list(pageSize, offset)
+  // TODO Review comments of code, try to fix, if will not work out -> remove
+
+  //  def list(pageSize: Int, offset: Int): F[List[User]] =
+  //    userRepo.list(pageSize, offset)
 }
 
 object UserService {

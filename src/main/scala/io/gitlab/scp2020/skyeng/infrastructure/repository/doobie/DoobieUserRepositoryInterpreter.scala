@@ -7,22 +7,14 @@ import cats.syntax.all._
 import doobie.implicits.{toSqlInterpolator, _}
 import doobie.{Query0, Transactor, Update0}
 import io.gitlab.scp2020.skyeng.domain.users.{User, UserRepositoryAlgebra}
-import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.SQLPagination.paginate
 import tsec.authentication.IdentityStore
-//import doobie.implicits.legacy.instant._
-//import doobie.implicits.legacy.localdate._
-// TODO import java.sql.timestamp everywhere we use timestamp, broteshka :)
-// and date from java.util package
-// Instant, LocalDate, LocalTime, LocalDateTime, OffsetTime, OffsetDateTime and ZonedDateTime from the java.time package
+
+//import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.SQLPagination.paginate
 
 
 private object UserSQL {
-  // H2 does not support JSON data type.
-//  implicit val roleMeta: Meta[Role] =
-//    Meta[String].imap(decode[Role](_).leftMap(throw _).merge)(_.asJson.toString)
 
   import doobie.implicits.javatime._
-
   def insert(user: User): Update0 =
     sql"""
     INSERT INTO USER (user_name, first_name,last_name,birth_date,gender,email,hash,phone_number,role,created)
@@ -65,11 +57,12 @@ private object UserSQL {
   """.update
 
   // TODO here is the error with params
-  val selectAll: Query0[User] =
-    sql"""
-    SELECT user_name, first_name,last_name,birth_date,gender,email,hash,phone_number,role,created, id
-    FROM USER
-  """.query[User]
+
+  //  val selectAll: Query0[User] =
+  //    sql"""
+  //    SELECT user_name, first_name,last_name,birth_date,gender,email,hash,phone_number,role,created, id
+  //    FROM USER
+  //  """.query[User]
 }
 
 class DoobieUserRepositoryInterpreter[F[_] : Bracket[*[_], Throwable]](val xa: Transactor[F])
@@ -98,8 +91,8 @@ class DoobieUserRepositoryInterpreter[F[_] : Bracket[*[_], Throwable]](val xa: T
   def deleteByUserName(userName: String): OptionT[F, User] =
     findByUserName(userName).mapFilter(_.id).flatMap(delete)
 
-  def list(pageSize: Int, offset: Int): F[List[User]] =
-    paginate(pageSize, offset)(selectAll).to[List].transact(xa)
+  //  def list(pageSize: Int, offset: Int): F[List[User]] =
+  //    paginate(pageSize, offset)(selectAll).to[List].transact(xa)
 }
 
 object DoobieUserRepositoryInterpreter {
