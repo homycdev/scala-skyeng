@@ -17,7 +17,7 @@ import tsec.mac.jca.HMACSHA256
 import tsec.passwordhashers.jca.BCrypt
 
 
-object Server extends IOApp {
+object SkyengServer extends IOApp {
 
   def createServer[F[_] : ContextShift : ConcurrentEffect : Timer]: Resource[F, H4Server[F]] =
     for {

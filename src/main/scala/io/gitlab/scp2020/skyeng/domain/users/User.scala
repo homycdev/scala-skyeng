@@ -1,17 +1,24 @@
 package io.gitlab.scp2020.skyeng.domain.users
 
+//import java.time.LocalDateTime
+
+import java.time.LocalDateTime
+
 import cats.Applicative
 import tsec.authorization.AuthorizationInfo
 
 case class User(
                  userName: String,
-                 firstName: String,
-                 lastName: String,
+                 firstName: Option[String] = None,
+                 lastName: Option[String] = None,
+                 birthDate: Option[String] = None,
+                 gender: Option[String] = None,
                  email: String,
                  hash: String,
-                 phone: String,
-                 id: Option[Long] = None,
+                 phone: Option[String] = None,
                  role: Role = Role("Student"),
+                 created: LocalDateTime = LocalDateTime.now(),
+                 id: Option[Long] = None,
                )
 
 object User {

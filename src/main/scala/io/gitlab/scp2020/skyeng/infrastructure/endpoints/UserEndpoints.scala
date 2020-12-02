@@ -10,7 +10,6 @@ import io.gitlab.scp2020.skyeng.domain.authentication.{Auth, LoginRequest, Signu
 import io.gitlab.scp2020.skyeng.domain.users.{User, UserService}
 import io.gitlab.scp2020.skyeng.domain.{UserAlreadyExistsError, UserAuthenticationFailedError, UserNotFoundError}
 import io.gitlab.scp2020.skyeng.infrastructure.endpoint.{AuthEndpoint, AuthService}
-import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.Pagination.{OptionalOffsetMatcher, OptionalPageSizeMatcher}
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{EntityDecoder, HttpRoutes}
@@ -18,6 +17,7 @@ import tsec.authentication._
 import tsec.common.Verified
 import tsec.jwt.algorithms.JWTMacAlgo
 import tsec.passwordhashers.{PasswordHash, PasswordHasher}
+//import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.Pagination.{OptionalOffsetMatcher, OptionalPageSizeMatcher}
 
 class UserEndpoints[F[_] : Sync, A, Auth: JWTMacAlgo] extends Http4sDsl[F] {
 
@@ -90,16 +90,17 @@ class UserEndpoints[F[_] : Sync, A, Auth: JWTMacAlgo] extends Http4sDsl[F] {
         case Left(UserNotFoundError) => NotFound("User not found")
       }
   }
+  // TODO Review comments of code, try to fix, if will not work out -> remove
 
-  private def listEndpoint(userService: UserService[F]): AuthEndpoint[F, Auth] = {
-    case GET -> Root :? OptionalPageSizeMatcher(pageSize) :? OptionalOffsetMatcher(
-    offset,
-    ) asAuthed _ =>
-      for {
-        retrieved <- userService.list(pageSize.getOrElse(10), offset.getOrElse(0))
-        resp <- Ok(retrieved.asJson)
-      } yield resp
-  }
+  //  private def listEndpoint(userService: UserService[F]): AuthEndpoint[F, Auth] = {
+  //    case GET -> Root :? OptionalPageSizeMatcher(pageSize) :? OptionalOffsetMatcher(
+  //    offset,
+  //    ) asAuthed _ =>
+  //      for {
+  //        retrieved <- userService.list(pageSize.getOrElse(10), offset.getOrElse(0))
+  //        resp <- Ok(retrieved.asJson)
+  //      } yield resp
+  //  }
 
   private def searchByNameEndpoint(userService: UserService[F]): AuthEndpoint[F, Auth] = {
     case GET -> Root / userName asAuthed _ =>
@@ -117,7 +118,7 @@ class UserEndpoints[F[_] : Sync, A, Auth: JWTMacAlgo] extends Http4sDsl[F] {
       } yield resp
   }
 
-
+  // TODO Review comments of code, try to fix, if will not work out -> remove
   def endpoints(
                  userService: UserService[F],
                  cryptService: PasswordHasher[F, A],
@@ -126,9 +127,9 @@ class UserEndpoints[F[_] : Sync, A, Auth: JWTMacAlgo] extends Http4sDsl[F] {
     val authEndpoints: AuthService[F, Auth] =
       Auth.adminOnly {
         updateEndpoint(userService)
-          .orElse(listEndpoint(userService))
           .orElse(searchByNameEndpoint(userService))
           .orElse(deleteUserEndpoint(userService))
+        //          .orElse(listEndpoint(userService))
       }
 
     val unauthEndpoints =

@@ -16,6 +16,7 @@ import tsec.mac.jca._
 trait SkyEngArbitraries {
   val userNameLength = 16
   val userNameGen: Gen[String] = Gen.listOfN(userNameLength, Gen.alphaChar).map(_.mkString)
+  val optionString: Gen[Option[String]] = Gen.some(arbitrary[String])
 
   implicit val instant: Arbitrary[Instant] = Arbitrary[Instant] {
     for {
@@ -28,14 +29,28 @@ trait SkyEngArbitraries {
   implicit val user: Arbitrary[User] = Arbitrary[User] {
     for {
       userName <- userNameGen
-      firstName <- arbitrary[String]
-      lastName <- arbitrary[String]
+      firstName <- optionString
+      lastName <- optionString
+      birthDate <- optionString
+      gender <- optionString
       email <- arbitrary[String]
       password <- arbitrary[String]
-      phone <- arbitrary[String]
-      id <- Gen.option(Gen.posNum[Long])
+      phone <- optionString
       role <- arbitrary[Role]
-    } yield User(userName, firstName, lastName, email, password, phone, id, role)
+      id <- Gen.option(Gen.posNum[Long])
+
+    } yield User(
+      userName,
+      firstName,
+      lastName,
+      birthDate,
+      gender,
+      email,
+      password,
+      phone,
+      role,
+        id = id)
+
   }
 
   case class AdminUser(value: User)
@@ -53,13 +68,26 @@ trait SkyEngArbitraries {
   implicit val userSignup: Arbitrary[SignupRequest] = Arbitrary[SignupRequest] {
     for {
       userName <- userNameGen
-      firstName <- arbitrary[String]
-      lastName <- arbitrary[String]
+      firstName <- optionString
+      lastName <- optionString
+      birthDate <- optionString
+      gender <- optionString
       email <- arbitrary[String]
       password <- arbitrary[String]
-      phone <- arbitrary[String]
+      phone <- optionString
       role <- arbitrary[Role]
-    } yield SignupRequest(userName, firstName, lastName, email, password, phone, role)
+
+    } yield SignupRequest(
+      userName,
+      firstName,
+      lastName,
+      birthDate,
+      gender,
+      email,
+      password,
+      phone,
+      role,
+      )
   }
 
   implicit val secureRandomId: Arbitrary[SecureRandomId] = Arbitrary[SecureRandomId] {

@@ -60,14 +60,15 @@ class UserEndpointsSpec
       (for {
         loginResp <- signUpAndLogInAsAdmin(userSignup, userEndpoint)
         (createdUser, authorization) = loginResp
-        userToUpdate = createdUser.copy(lastName = createdUser.lastName.reverse)
+        userToUpdate = createdUser.copy(lastName = Some(createdUser.lastName.get.reverse))
         updateUser <- PUT(userToUpdate, Uri.unsafeFromString(s"/users/${createdUser.userName}"))
         updateUserAuth = updateUser.putHeaders(authorization.get)
         updateResponse <- userEndpoint.run(updateUserAuth)
         updatedUser <- updateResponse.as[User]
       } yield {
+        //TODO REVIEW wrapping to option. I dont like it, to be honest.
         updateResponse.status shouldEqual Ok
-        updatedUser.lastName shouldEqual createdUser.lastName.reverse
+        updatedUser.lastName shouldEqual Some(createdUser.lastName.get.reverse)
         createdUser.id shouldEqual updatedUser.id
       }).unsafeRunSync()
     }
