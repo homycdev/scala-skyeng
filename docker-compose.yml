@@ -9,43 +9,20 @@ services:
       - market_postgres_data:/var/lib/postgresql/data:delegated
     ports:
       - 5432:5432
-    environment:
-      - PGDATA=/var/lib/postgresql/data/pgdata
-      - POSTGRES_PASSWORD=skyengdb
-      - POSTGRES_USER=skyengdb
-      - POSTGRES_DB=postgres
     networks:
       - net
+    env_file:
+      - .env
 
-  server:
-    image: ${REGISTRY}/server:${DOCKER_TAG}
-    build:
-      context: ./
-    hostname: server
+  skyeng-server:
+    image: scp2020:latest
+    hostname: skyeng-server
     ports:
       - 8080:8080
+    env_file:
+      - .env
     networks:
       - net
-    command:
-      - java
-      - -jar
-      - -Dserver.port=8762
-      - -Xmx64m
-      - --add-modules
-      - java.se
-      - --add-exports
-      - java.base/jdk.internal.ref=ALL-UNNAMED
-      - --add-opens
-      - java.base/java.lang=ALL-UNNAMED
-      - --add-opens
-      - java.base/java.nio=ALL-UNNAMED
-      - --add-opens
-      - java.base/sun.nio.ch=ALL-UNNAMED
-      - --add-opens
-      - java.management/sun.management=ALL-UNNAMED
-      - --add-opens
-      - jdk.management/com.sun.management.internal=ALL-UNNAMED
-      - apps/server.jar
 
 networks:
   net:

@@ -52,12 +52,12 @@ Run following bash scripts to run the server application:
 
 1. Built the project:
 ```
-./step1_build_jars.sh
+sbt docker:publishLocal
 ```
 
 Once app is loaded, run second step to run the app:
 ```
-./step2_run_apps.sh
+docker-compose up -d --build
 ```
 then 
 ```

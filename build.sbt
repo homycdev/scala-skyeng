@@ -1,10 +1,10 @@
+name := "scp2020"
 
-name := "SCP2020"
+organization := "skyeng"
 
 version := "0.1"
 
-crossScalaVersions := Seq("2.12.12", "2.13.3")
-
+scalaVersion := "2.13.3"
 
 resolvers += Resolver.sonatypeRepo("snapshots")
 resolvers += Resolver.bintrayIvyRepo("eed3si9n", "sbt-plugins")
@@ -26,7 +26,6 @@ val FlywayVersion = "7.2.0"
 
 val Slf4jVersion = "1.7.30"
 
-
 // testing
 val ScalaCheckVersion = "1.15.1"
 val ScalaTestVersion = "3.2.3"
@@ -45,28 +44,21 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-generic-extras" % CirceGenericExVersion,
   "io.circe" %% "circe-parser" % CirceVersion,
   "io.circe" %% "circe-config" % CirceConfigVersion,
-
   "org.tpolecat" %% "doobie-core" % DoobieVersion,
   "org.tpolecat" %% "doobie-postgres" % "0.9.0",
   "org.tpolecat" %% "doobie-scalatest" % DoobieVersion,
   "org.tpolecat" %% "doobie-hikari" % DoobieVersion,
-
   "com.beachape" %% "enumeratum-circe" % EnumeratumCirceVersion,
-
-  "org.http4s"      %% "http4s-blaze-server" % Http4sVersion,
-  "org.http4s"      %% "http4s-blaze-client" % Http4sVersion % Test,
-  "org.http4s"      %% "http4s-circe"        % Http4sVersion,
-  "org.http4s"      %% "http4s-dsl"          % Http4sVersion,
-
+  "org.http4s" %% "http4s-blaze-server" % Http4sVersion,
+  "org.http4s" %% "http4s-blaze-client" % Http4sVersion % Test,
+  "org.http4s" %% "http4s-circe" % Http4sVersion,
+  "org.http4s" %% "http4s-dsl" % Http4sVersion,
   "ch.qos.logback" % "logback-classic" % LogbackVersion,
-
   "org.postgresql" % "postgresql" % "42.2.16",
   "org.flywaydb" % "flyway-core" % FlywayVersion,
-
   "org.scalacheck" %% "scalacheck" % ScalaCheckVersion % Test,
   "org.scalatest" %% "scalatest" % ScalaTestVersion % Test,
   "org.scalatestplus" %% "scalacheck-1-14" % ScalaTestPlusVersion % Test,
-
   // Authentication dependencies
   "io.github.jmcardon" %% "tsec-common" % TsecVersion,
   "io.github.jmcardon" %% "tsec-password" % TsecVersion,
@@ -74,32 +66,45 @@ libraryDependencies ++= Seq(
   "io.github.jmcardon" %% "tsec-signatures" % TsecVersion,
   "io.github.jmcardon" %% "tsec-jwt-mac" % TsecVersion,
   "io.github.jmcardon" %% "tsec-jwt-sig" % TsecVersion,
-  "io.github.jmcardon" %% "tsec-http4s" % TsecVersion,
-
-
-
-  //tapir
-
-//  "com.softwaremill.sttp.tapir" %% "tapir-core"               %  Tapir,
-//  "com.softwaremill.sttp.tapir" %% "tapir-openapi-docs"       %  Tapir,
-//  "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe"      %  Tapir,
-//  "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe-yaml" %  Tapir,
-//  "com.softwaremill.sttp.tapir" %% "tapir-sttp-client"        %  Tapir,
-//  "com.softwaremill.sttp.tapir" %% "tapir-http4s-server"      %  Tapir,
-//  "com.softwaremill.sttp.tapir" %% "tapir-json-circe"         %  Tapir,
-//  "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-http4s"  %  Tapir,
-//
-//  // STTP
-//  "com.softwaremill.sttp.client" %% "async-http-client-backend-zio" % STTP,
-//  "com.softwaremill.sttp.client" %% "circe"                         % STTP,
+  "io.github.jmcardon" %% "tsec-http4s" % TsecVersion
 )
 dependencyOverrides += "org.slf4j" % "slf4j-api" % Slf4jVersion
 
-
 addCompilerPlugin(
-  ("org.typelevel" %% "kind-projector" % KindProjectorVersion).cross(CrossVersion.full),
+  ("org.typelevel" %% "kind-projector" % KindProjectorVersion)
+    .cross(CrossVersion.full)
 )
-enablePlugins(ScalafmtPlugin, JavaAppPackaging, GhpagesPlugin, MicrositesPlugin, TutPlugin, DockerPlugin, AssemblyPlugin)
+enablePlugins(
+  ScalafmtPlugin,
+  JavaAppPackaging,
+  GhpagesPlugin,
+  MicrositesPlugin,
+  TutPlugin,
+  AssemblyPlugin
+)
+enablePlugins(DockerPlugin, JavaAppPackaging, AshScriptPlugin)
+
+//packageName in Docker := packageName.value
+//dockerBaseImage in Docker := "openjdk:8-jre-alpine"
+dockerUpdateLatest := true
+//version in Docker := version.value
+
+//dockerfile in docker := {
+//  val appDir = stage.value
+//  val targetDir = "/app"
+//
+//  new Dockerfile {
+//    from("openjdk:8-jre")
+//    entryPoint(s"$targetDir/bin/${executableScriptName.value}")
+//    copy(appDir, targetDir)
+//  }
+//}
+//
+//buildOptions in docker := BuildOptions(
+//  cache = false,
+//  removeIntermediateContainers = BuildOptions.Remove.Always,
+//  pullBaseImage = BuildOptions.Pull.Always,
+//)
 
 // Note: This fixes error with sbt run not loading config properly
 fork in run := true
@@ -108,5 +113,5 @@ dockerExposedPorts ++= Seq(8080)
 
 assemblyMergeStrategy in assembly := {
   case PathList("META-INF", xs @ _*) => MergeStrategy.discard
-  case _ => MergeStrategy.first
+  case _                             => MergeStrategy.first
 }
