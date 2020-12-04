@@ -17,8 +17,8 @@ object DoobieCustomMapping {
       case Homework => "homework"
     }
 
-  def fromClassType(s: String): Option[ClassType] =
-    Option(s) collect {
+  def fromClassType(s: String): ClassType =
+    s match {
       case "lesson" => Lesson
       case "homework" => Homework
     }
@@ -32,8 +32,8 @@ object DoobieCustomMapping {
       case Listening => "listening"
     }
 
-  def fromTaskType(s: String): Option[TaskType] =
-    Option(s) collect {
+  def fromTaskType(s: String): TaskType =
+    s match {
       case "vocabulary" => Vocabulary
       case "grammar" => Grammar
       case "writing" => Writing
@@ -47,8 +47,8 @@ object DoobieCustomMapping {
       case NativeSpeaker => "native_speaker"
     }
 
-  def fromQualificationType(s: String): Option[QualificationType] =
-    Option(s) collect {
+  def fromQualificationType(s: String): QualificationType =
+    s match {
       case "not_native_speaker" => NotNativeSpeaker
       case "native_speaker" => NativeSpeaker
     }
@@ -63,8 +63,8 @@ object DoobieCustomMapping {
       case Advanced => "advanced"
     }
 
-  def fromLevelType(s: String): Option[LevelType] =
-    Option(s) collect {
+  def fromLevelType(s: String): LevelType =
+    s match {
       case "beginner" => Beginner
       case "elementary" => Elementary
       case "pre_intermediate" => PreIntermediate
@@ -80,8 +80,8 @@ object DoobieCustomMapping {
       case Match => "match"
     }
 
-  def fromExerciseType(s: String): Option[ExerciseType] =
-    Option(s) collect {
+  def fromExerciseType(s: String): ExerciseType =
+    s match {
       case "true_false" => TrueFalse
       case "fill_blanks" => FillBlanks
       case "match" => Match

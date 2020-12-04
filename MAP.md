@@ -15,3 +15,4 @@ A lot of fixes had been introduced, which is good. Tells that project is being r
 
 
 ## Link to web diagram 
+![diagram](https://docs.google.com/spreadsheets/d/e/2PACX-1vTXIhfQzTkLutk3Wp2zWwAcCXQe7GZCZGWMZHp4nMPAgInjsxWohwH5hxwd4N9iyATx-H-QBAiTGWlj/pubchart?oid=1278371160&format=image)

@@ -3,6 +3,8 @@ package io.gitlab.scp2020.skyeng.domain.courses
 import enumeratum.EnumEntry.Snakecase
 import enumeratum._
 
+import scala.collection.immutable
+
 sealed trait LevelType extends EnumEntry with Snakecase
 
 case object LevelType extends Enum[LevelType]
@@ -20,5 +22,5 @@ case object LevelType extends Enum[LevelType]
 
   case object Advanced extends LevelType
 
-  val values = findValues
+  val values: immutable.IndexedSeq[LevelType] = findValues
 }
