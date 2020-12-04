@@ -1,8 +1,11 @@
 package io.gitlab.scp2020.skyeng.domain.schedule
 
+import java.time.LocalDateTime
+
 case class Schedule(
-                     id: Long,
+                     id: Option[Long],
                      studentId: Long,
-                     teacherId: Long, // TODO: add 'start_time' field
+                     teacherId: Long,
+                     startTime: LocalDateTime,
                      durationSeconds: Int,
                    )

@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS "word"
 (
     "id"                  BIGSERIAL PRIMARY KEY,
-    "phase"               VARCHAR(255) NOT NULL,
+    "phrase"              VARCHAR(255) NOT NULL,
     "image_url"           VARCHAR(512),
     "transcript"          VARCHAR(512),
     "english_meaning"     VARCHAR(2048),

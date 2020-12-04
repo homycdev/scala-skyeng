@@ -1,14 +1,19 @@
 package io.gitlab.scp2020.skyeng
 
-
 import cats.effect.{ConcurrentEffect, ContextShift, Resource, Timer, _}
 import doobie.util.ExecutionContexts
 import io.circe.config.parser
 import io.gitlab.scp2020.skyeng.config.{DatabaseConfig, SkyEngConfig}
 import io.gitlab.scp2020.skyeng.domain.authentication.Auth
-import io.gitlab.scp2020.skyeng.domain.users.{UserService, UserValidationInterpreter}
+import io.gitlab.scp2020.skyeng.domain.users.{
+  UserService,
+  UserValidationInterpreter
+}
 import io.gitlab.scp2020.skyeng.infrastructure.endpoints.UserEndpoints
-import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.{DoobieAuthRepositoryInterpreter, DoobieUserRepositoryInterpreter}
+import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.{
+  DoobieAuthRepositoryInterpreter,
+  DoobieUserRepositoryInterpreter
+}
 import org.http4s.implicits.http4sKleisliResponseSyntaxOptionT
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.server.{Router, Server => H4Server}
@@ -16,17 +21,22 @@ import tsec.authentication.SecuredRequestHandler
 import tsec.mac.jca.HMACSHA256
 import tsec.passwordhashers.jca.BCrypt
 
-
 object SkyengServer extends IOApp {
 
-  def createServer[F[_] : ContextShift : ConcurrentEffect : Timer]: Resource[F, H4Server[F]] =
+  def createServer[F[_]: ContextShift: ConcurrentEffect: Timer]
+      : Resource[F, H4Server[F]] =
     for {
       // Configs load
       conf <- Resource.liftF(parser.decodePathF[F, SkyEngConfig]("skyeng"))
       serverEc <- ExecutionContexts.cachedThreadPool[F]
-      connEc <- ExecutionContexts.fixedThreadPool[F](conf.db.connections.poolSize)
+      connEc <-
+        ExecutionContexts.fixedThreadPool[F](conf.db.connections.poolSize)
       txnEc <- ExecutionContexts.cachedThreadPool[F]
-      xa <- DatabaseConfig.dbTransactor(conf.db, connEc, Blocker.liftExecutionContext(txnEc))
+      xa <- DatabaseConfig.dbTransactor(
+        conf.db,
+        connEc,
+        Blocker.liftExecutionContext(txnEc)
+      )
       key <- Resource.liftF(HMACSHA256.generateKey[F])
 
       // Repositories init
@@ -40,15 +50,18 @@ object SkyengServer extends IOApp {
       userService = UserService[F](userRepo, userValidation)
 
       // Authenticator
-      authenticator = Auth.jwtAuthenticator[F, HMACSHA256](key, authRepo, userRepo)
+      authenticator =
+        Auth.jwtAuthenticator[F, HMACSHA256](key, authRepo, userRepo)
       routeAuth = SecuredRequestHandler(authenticator)
 
       httpApp = Router(
         "/users" -> UserEndpoints
-          .endpoints[F, BCrypt, HMACSHA256](userService, BCrypt.syncPasswordHasher[F], routeAuth)
+          .endpoints[F, BCrypt, HMACSHA256](
+            userService,
+            BCrypt.syncPasswordHasher[F],
+            routeAuth
+          )
       ).orNotFound
-
-
 
       _ <- Resource.liftF(DatabaseConfig.initDb(conf.db))
 
@@ -58,6 +71,7 @@ object SkyengServer extends IOApp {
         .resource
     } yield server
 
-  def run(args: List[String]): IO[ExitCode] = createServer.use { _ => IO.never }.as(ExitCode.Success)
+  def run(args: List[String]): IO[ExitCode] =
+    createServer.use { _ => IO.never }.as(ExitCode.Success)
 
 }

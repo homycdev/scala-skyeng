@@ -53,7 +53,6 @@ CREATE TABLE IF NOT EXISTS "task"
     "id"            BIGSERIAL PRIMARY KEY,
     "class_id"      BIGINT REFERENCES "class" (id) ON DELETE CASCADE,
     "type"          VARCHAR(16) NOT NULL,
-    "difficulty"    VARCHAR(16) NOT NULL,
     "list_position" INT         NOT NULL
 );
 
