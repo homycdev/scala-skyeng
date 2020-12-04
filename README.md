@@ -13,7 +13,7 @@ Role model: clients, educators, administrators
 - Assigning Clients Lessons
 - Billing for clients and teachers
 
-## Architecture V 0.1
+## Architecture 
 ### Technology Stack
 In the project given we will try to work with TypeLevel stack and see whether is it going to be possible to keep it as close to practices of FP 
 programming. 
@@ -33,18 +33,25 @@ Using this approach we are decoupling our application modules into separate part
 `todo1: insert graph of arch`
 
 #### Modules:
-- **Domain**: Module where we describe the core business logic
+- **Domain**: Module where we describe the core business logic. It consists of following:
+    - Authentication - helps with authentication
+    - Courses - course back-end logics, with related entities
+    - Payment - payment service
+    - Results - helper module, consists of entities which needed to evaluate Students' performance
+    - Schedule - scheduling service that helps to students to choose the Classes
+    - Users - has user, teacher, student services 
 - **Infrastructure**: Module where we describe the endpoints and db operating functions
 - **Configuration**: Module where we describe configurations of the app(which db to use, on which ports to run the server, etc.)
 
 `todo2: insert the detailed description of each module`
 
 #### DataBase scheme:
-For the current version V 0.1 , there are some entities related to `User` Business logic.
-!DISCLAIMER! DB Scheme is still in development. Many things may change later on :)
 You can observe the scheme in the following [link](https://drive.google.com/file/d/1sknFvJ0BTB3cFnHtQf6PakkdaXu1NTkh/view?usp=sharing)
 
 
+## Branch creation policy
+1. Create Issue as following: SCP-###: Issue Title
+2. Create Branch in issue as following: scp-###-issue-title
 
 ## How to run?
 
