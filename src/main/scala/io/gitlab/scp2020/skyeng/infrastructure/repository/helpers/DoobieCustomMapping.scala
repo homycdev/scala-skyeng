@@ -1,7 +1,7 @@
 package io.gitlab.scp2020.skyeng.infrastructure.repository.helpers
 
 import io.gitlab.scp2020.skyeng.domain.courses.ExerciseType.{FillBlanks, Match, TrueFalse}
-import io.gitlab.scp2020.skyeng.domain.courses.LevelType.{Advanced, Begginer, Elementary, Intermediate, PreIntermediate, UpperIntermediate}
+import io.gitlab.scp2020.skyeng.domain.courses.LevelType.{Advanced, Beginner, Elementary, Intermediate, PreIntermediate, UpperIntermediate}
 import io.gitlab.scp2020.skyeng.domain.courses.TaskType.{Grammar, Listening, Reading, Vocabulary, Writing}
 import io.gitlab.scp2020.skyeng.domain.courses.classes.ClassType
 import io.gitlab.scp2020.skyeng.domain.courses.classes.ClassType.{Homework, Lesson}
@@ -55,7 +55,7 @@ object DoobieCustomMapping {
 
   def toLevelType(c: LevelType): String =
     c match {
-      case Begginer => "begginer"
+      case Beginner => "beginner"
       case Elementary => "elementary"
       case PreIntermediate => "pre_intermediate"
       case Intermediate => "intermediate"
@@ -65,7 +65,7 @@ object DoobieCustomMapping {
 
   def fromLevelType(s: String): Option[LevelType] =
     Option(s) collect {
-      case "begginer" => Begginer
+      case "beginner" => Beginner
       case "elementary" => Elementary
       case "pre_intermediate" => PreIntermediate
       case "intermediate" => Intermediate

@@ -8,7 +8,7 @@ sealed trait LevelType extends EnumEntry with Snakecase
 case object LevelType extends Enum[LevelType]
   with CirceEnum[LevelType] {
 
-  case object Begginer extends LevelType
+  case object Beginner extends LevelType
 
   case object Elementary extends LevelType
 

@@ -3,6 +3,7 @@
 .idea
 .metals
 .vscode
+.env
 target
 project/target
 project/.bloop
