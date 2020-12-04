@@ -1,4 +1,4 @@
-package io.gitlab.scp2020.skyeng.domain.courses
+package io.gitlab.scp2020.skyeng.domain.courses.classes
 
 import enumeratum.EnumEntry.Snakecase
 import enumeratum._
@@ -7,8 +7,7 @@ import scala.collection.immutable
 
 sealed trait LevelType extends EnumEntry with Snakecase
 
-case object LevelType extends Enum[LevelType]
-  with CirceEnum[LevelType] {
+case object LevelType extends Enum[LevelType] with CirceEnum[LevelType] {
 
   case object Beginner extends LevelType
 

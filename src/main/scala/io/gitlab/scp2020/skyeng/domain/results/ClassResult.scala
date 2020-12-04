@@ -1,7 +1,7 @@
 package io.gitlab.scp2020.skyeng.domain.results
 
 case class ClassResult(
-                        id: Long,
+                        id: Option[Long],
                         studentId: Long,
                         classId: Long,
                         score: Int
