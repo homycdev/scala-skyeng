@@ -1,5 +1,4 @@
-package io.gitlab.scp2020.skyeng
-package infrastructure.repository.inmemory
+package io.gitlab.scp2020.skyeng.infrastructure.repository.inmemory.users
 
 import java.util.Random
 
@@ -11,8 +10,8 @@ import tsec.authentication.IdentityStore
 
 import scala.collection.concurrent.TrieMap
 
-class UserRepositoryInMemoryInterpreter[F[_] : Applicative]
-  extends UserRepositoryAlgebra[F]
+class UserRepositoryInMemoryInterpreter[F[_]: Applicative]
+    extends UserRepositoryAlgebra[F]
     with IdentityStore[F, Long, User] {
   private val cache = new TrieMap[Long, User]
 
@@ -25,12 +24,13 @@ class UserRepositoryInMemoryInterpreter[F[_] : Applicative]
     toSave.pure[F]
   }
 
-  def update(user: User): OptionT[F, User] = OptionT {
-    user.id.traverse { id =>
-      cache.update(id, user)
-      user.pure[F]
+  def update(user: User): OptionT[F, User] =
+    OptionT {
+      user.id.traverse { id =>
+        cache.update(id, user)
+        user.pure[F]
+      }
     }
-  }
 
   def get(id: Long): OptionT[F, User] =
     OptionT.fromOption(cache.get(id))
@@ -42,19 +42,21 @@ class UserRepositoryInMemoryInterpreter[F[_] : Applicative]
     OptionT.fromOption(cache.values.find(u => u.userName == userName))
 
   def list(pageSize: Int, offset: Int): F[List[User]] =
-    cache.values.toList.sortBy(_.lastName).slice(offset, offset + pageSize).pure[F]
+    cache.values.toList
+      .sortBy(_.lastName)
+      .slice(offset, offset + pageSize)
+      .pure[F]
 
   def deleteByUserName(userName: String): OptionT[F, User] =
     OptionT.fromOption(
       for {
         user <- cache.values.find(u => u.userName == userName)
         removed <- cache.remove(user.id.get)
-      } yield removed,
+      } yield removed
     )
 }
 
 object UserRepositoryInMemoryInterpreter {
-  def apply[F[_] : Applicative]() =
+  def apply[F[_]: Applicative]() =
     new UserRepositoryInMemoryInterpreter[F]
 }
-

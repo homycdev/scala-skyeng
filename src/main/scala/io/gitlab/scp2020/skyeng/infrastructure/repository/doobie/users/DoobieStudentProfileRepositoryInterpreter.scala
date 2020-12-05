@@ -1,4 +1,4 @@
-package io.gitlab.scp2020.skyeng.infrastructure.repository.doobie
+package io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.users
 
 import cats.data.OptionT
 import cats.effect.Bracket
@@ -8,14 +8,25 @@ import doobie.util.query.Query0
 import doobie.util.transactor.Transactor
 import doobie.util.update.Update0
 import doobie.{Get, Put}
-import io.gitlab.scp2020.skyeng.domain.users.student.{StudentProfile, StudentRepositoryAlgebra}
-import io.gitlab.scp2020.skyeng.domain.users.teacher.{QualificationType, TeacherProfile}
-import io.gitlab.scp2020.skyeng.infrastructure.repository.helpers.DoobieCustomMapping.{fromQualificationType, toQualificationType}
+import io.gitlab.scp2020.skyeng.domain.users.student.{
+  StudentProfile,
+  StudentRepositoryAlgebra
+}
+import io.gitlab.scp2020.skyeng.domain.users.teacher.{
+  QualificationType,
+  TeacherProfile
+}
+import io.gitlab.scp2020.skyeng.infrastructure.repository.helpers.DoobieCustomMapping.{
+  fromQualificationType,
+  toQualificationType
+}
 import tsec.authentication.IdentityStore
 
 private object StudentSQL {
-  implicit val qualificationTypeGet: Get[QualificationType] = Get[String].tmap(fromQualificationType)
-  implicit val qualificationTypePut: Put[QualificationType] = Put[String].tcontramap(toQualificationType)
+  implicit val qualificationTypeGet: Get[QualificationType] =
+    Get[String].tmap(fromQualificationType)
+  implicit val qualificationTypePut: Put[QualificationType] =
+    Put[String].tcontramap(toQualificationType)
 
   def createStudent(newStudent: StudentProfile): Update0 =
     sql"""
@@ -34,7 +45,6 @@ private object StudentSQL {
     sql"""
          |delete from student_profile where user_id = $studentId
          |""".stripMargin.update
-
 
   def getStudentProfile(studentId: Long): Query0[StudentProfile] =
     sql"""
@@ -57,33 +67,42 @@ private object StudentSQL {
 
 }
 
-
-class DoobieStudentProfileRepository[F[_] : Bracket[*[_], Throwable]](val xa: Transactor[F])
-  extends StudentRepositoryAlgebra[F]
+class DoobieStudentProfileRepository[F[_]: Bracket[*[_], Throwable]](
+    val xa: Transactor[F]
+) extends StudentRepositoryAlgebra[F]
     with IdentityStore[F, Long, StudentProfile] {
   self =>
 
   import StudentSQL._
 
   override def create(student: StudentProfile): F[StudentProfile] =
-    createStudent(student)
-      .run
+    createStudent(student).run
       .transact(xa)
       .as(student)
 
   override def update(student: StudentProfile): OptionT[F, StudentProfile] =
-    OptionT.fromOption[F](Some(student.userId))
-      .semiflatMap(id => StudentSQL.updateStudentProfile(student, id).run.transact(xa).as(student))
+    OptionT
+      .fromOption[F](Some(student.userId))
+      .semiflatMap(id =>
+        StudentSQL
+          .updateStudentProfile(student, id)
+          .run
+          .transact(xa)
+          .as(student)
+      )
 
   override def get(id: Long): OptionT[F, StudentProfile] =
     OptionT(getStudentProfile(id).option.transact(xa))
 
   override def delete(studentId: Long): OptionT[F, StudentProfile] =
     get(studentId)
-      .semiflatMap(student => StudentSQL
-        .deleteStudentProfile(studentId)
-        .run
-        .transact(xa).as(student))
+      .semiflatMap(student =>
+        StudentSQL
+          .deleteStudentProfile(studentId)
+          .run
+          .transact(xa)
+          .as(student)
+      )
 
   override def getTeacher(studentId: Long): OptionT[F, TeacherProfile] =
     OptionT(getTeacherOfStudent(studentId).option.transact(xa))

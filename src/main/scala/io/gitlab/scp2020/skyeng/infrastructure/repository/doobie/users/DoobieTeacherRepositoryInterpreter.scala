@@ -1,18 +1,26 @@
-package io.gitlab.scp2020.skyeng.infrastructure.repository.doobie
+package io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.users
 
 import cats.data.OptionT
 import cats.effect.Bracket
 import cats.syntax.all._
 import doobie._
 import doobie.implicits._
-import io.gitlab.scp2020.skyeng.domain.users.teacher.{QualificationType, TeacherProfile, TeacherRepositoryAlgebra}
-import io.gitlab.scp2020.skyeng.infrastructure.repository.helpers.DoobieCustomMapping.{fromQualificationType, toQualificationType}
+import io.gitlab.scp2020.skyeng.domain.users.teacher.{
+  QualificationType,
+  TeacherProfile,
+  TeacherRepositoryAlgebra
+}
+import io.gitlab.scp2020.skyeng.infrastructure.repository.helpers.DoobieCustomMapping.{
+  fromQualificationType,
+  toQualificationType
+}
 import tsec.authentication.IdentityStore
 
 private object TeacherSQL {
-  implicit val qualificationTypeGet: Get[QualificationType] = Get[String].tmap(fromQualificationType)
-  implicit val qualificationTypePut: Put[QualificationType] = Put[String].tcontramap(toQualificationType)
-
+  implicit val qualificationTypeGet: Get[QualificationType] =
+    Get[String].tmap(fromQualificationType)
+  implicit val qualificationTypePut: Put[QualificationType] =
+    Put[String].tcontramap(toQualificationType)
 
   def createTeacherFromUser(newTeacher: TeacherProfile): Update0 =
     sql"""
@@ -42,31 +50,32 @@ private object TeacherSQL {
 
 }
 
-
-class DoobieTeacherInterpreter[F[_] : Bracket[*[_], Throwable]](val xa: Transactor[F])
-  extends TeacherRepositoryAlgebra[F]
+class DoobieTeacherInterpreter[F[_]: Bracket[*[_], Throwable]](
+    val xa: Transactor[F]
+) extends TeacherRepositoryAlgebra[F]
     with IdentityStore[F, Long, TeacherProfile] {
   self =>
 
   import TeacherSQL._
 
   def create(newTeacher: TeacherProfile): F[TeacherProfile] =
-    createTeacherFromUser(newTeacher)
-      .run
+    createTeacherFromUser(newTeacher).run
       .transact(xa)
       .as(newTeacher)
 
   // TODO implement these queries
   override def update(teacher: TeacherProfile): OptionT[F, TeacherProfile] =
-    OptionT.fromOption[F](Some(teacher.userId)).semiflatMap{
-      id => TeacherSQL.updateTeacherId(teacher, id).run.transact(xa).as(teacher)
+    OptionT.fromOption[F](Some(teacher.userId)).semiflatMap { id =>
+      TeacherSQL.updateTeacherId(teacher, id).run.transact(xa).as(teacher)
     }
 
   override def get(id: Long): OptionT[F, TeacherProfile] =
     OptionT(getTeacherProfile(id).option.transact(xa))
 
   override def delete(teacherId: Long): OptionT[F, TeacherProfile] =
-    get(teacherId).semiflatMap(teacher => TeacherSQL.deleteTeacherProfile(teacherId).run.transact(xa).as(teacher))
+    get(teacherId).semiflatMap(teacher =>
+      TeacherSQL.deleteTeacherProfile(teacherId).run.transact(xa).as(teacher)
+    )
 
 //  override def list(pageSize: Int, offset: Int): F[List[TeacherProfile]] = ???
 }

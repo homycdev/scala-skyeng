@@ -10,10 +10,8 @@ import io.gitlab.scp2020.skyeng.domain.users.{
   UserValidationInterpreter
 }
 import io.gitlab.scp2020.skyeng.infrastructure.endpoints.UserEndpoints
-import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.{
-  DoobieAuthRepositoryInterpreter,
-  DoobieUserRepositoryInterpreter
-}
+import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.DoobieAuthRepositoryInterpreter
+import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.users.DoobieUserRepositoryInterpreter
 import org.http4s.implicits.http4sKleisliResponseSyntaxOptionT
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.server.{Router, Server => H4Server}

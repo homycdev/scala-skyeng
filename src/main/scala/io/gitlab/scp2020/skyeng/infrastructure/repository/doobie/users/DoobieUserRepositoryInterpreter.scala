@@ -1,4 +1,4 @@
-package io.gitlab.scp2020.skyeng.infrastructure.repository.doobie
+package io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.users
 
 import cats.data.OptionT
 import cats.effect.Bracket
@@ -10,7 +10,6 @@ import io.gitlab.scp2020.skyeng.domain.users.{User, UserRepositoryAlgebra}
 import tsec.authentication.IdentityStore
 
 //import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.SQLPagination.paginate
-
 
 private object UserSQL {
 
@@ -65,28 +64,35 @@ private object UserSQL {
   //  """.query[User]
 }
 
-class DoobieUserRepositoryInterpreter[F[_] : Bracket[*[_], Throwable]](val xa: Transactor[F])
-  extends UserRepositoryAlgebra[F]
+class DoobieUserRepositoryInterpreter[F[_]: Bracket[*[_], Throwable]](
+    val xa: Transactor[F]
+) extends UserRepositoryAlgebra[F]
     with IdentityStore[F, Long, User] {
   self =>
 
   import UserSQL._
 
   def create(user: User): F[User] =
-    insert(user).withUniqueGeneratedKeys[Long]("ID").map(id => user.copy(id = id.some)).transact(xa)
+    insert(user)
+      .withUniqueGeneratedKeys[Long]("ID")
+      .map(id => user.copy(id = id.some))
+      .transact(xa)
 
   def update(user: User): OptionT[F, User] =
     OptionT.fromOption[F](user.id).semiflatMap { id =>
       UserSQL.update(user, id).run.transact(xa).as(user)
     }
 
-  def get(userId: Long): OptionT[F, User] = OptionT(select(userId).option.transact(xa))
+  def get(userId: Long): OptionT[F, User] =
+    OptionT(select(userId).option.transact(xa))
 
   def findByUserName(userName: String): OptionT[F, User] =
     OptionT(byUserName(userName).option.transact(xa))
 
   def delete(userId: Long): OptionT[F, User] =
-    get(userId).semiflatMap(user => UserSQL.delete(userId).run.transact(xa).as(user))
+    get(userId).semiflatMap(user =>
+      UserSQL.delete(userId).run.transact(xa).as(user)
+    )
 
   def deleteByUserName(userName: String): OptionT[F, User] =
     findByUserName(userName).mapFilter(_.id).flatMap(delete)
@@ -96,6 +102,8 @@ class DoobieUserRepositoryInterpreter[F[_] : Bracket[*[_], Throwable]](val xa: T
 }
 
 object DoobieUserRepositoryInterpreter {
-  def apply[F[_] : Bracket[*[_], Throwable]](xa: Transactor[F]): DoobieUserRepositoryInterpreter[F] =
+  def apply[F[_]: Bracket[*[_], Throwable]](
+      xa: Transactor[F]
+  ): DoobieUserRepositoryInterpreter[F] =
     new DoobieUserRepositoryInterpreter(xa)
 }
