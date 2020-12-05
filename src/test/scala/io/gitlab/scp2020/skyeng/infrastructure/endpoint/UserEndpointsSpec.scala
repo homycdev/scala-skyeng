@@ -9,7 +9,7 @@ import _root_.io.gitlab.scp2020.skyeng.SkyEngArbitraries._
 import _root_.io.gitlab.scp2020.skyeng.domain.authentication._
 import _root_.io.gitlab.scp2020.skyeng.domain.users._
 import _root_.io.gitlab.scp2020.skyeng.infrastructure.endpoints._
-import _root_.io.gitlab.scp2020.skyeng.infrastructure.repository.inmemory.UserRepositoryInMemoryInterpreter
+import _root_.io.gitlab.scp2020.skyeng.infrastructure.repository.inmemory.users._
 import org.http4s.client.dsl.Http4sClientDsl
 import org.http4s.implicits._
 import org.http4s.server.Router
@@ -24,7 +24,7 @@ import tsec.passwordhashers.jca.BCrypt
 import scala.concurrent.duration._
 
 class UserEndpointsSpec
-  extends AnyFunSuite
+    extends AnyFunSuite
     with Matchers
     with ScalaCheckPropertyChecks
     with Http4sDsl[IO]
@@ -35,11 +35,12 @@ class UserEndpointsSpec
     val userValidation = UserValidationInterpreter[IO](userRepo)
     val userService = UserService[IO](userRepo, userValidation)
     val key = HMACSHA256.unsafeGenerateKey
-    val jwtAuth = JWTAuthenticator.unbacked.inBearerToken(1.day, None, userRepo, key)
+    val jwtAuth =
+      JWTAuthenticator.unbacked.inBearerToken(1.day, None, userRepo, key)
     val usersEndpoint = UserEndpoints.endpoints(
       userService,
       BCrypt.syncPasswordHasher[IO],
-      SecuredRequestHandler(jwtAuth),
+      SecuredRequestHandler(jwtAuth)
     )
     Router(("/users", usersEndpoint)).orNotFound
   }
@@ -48,7 +49,8 @@ class UserEndpointsSpec
     val userEndpoint = userRoutes()
 
     forAll { userSignup: SignupRequest =>
-      val (_, authorization) = signUpAndLogIn(userSignup, userEndpoint).unsafeRunSync()
+      val (_, authorization) =
+        signUpAndLogIn(userSignup, userEndpoint).unsafeRunSync()
       authorization shouldBe defined
     }
   }
@@ -60,8 +62,12 @@ class UserEndpointsSpec
       (for {
         loginResp <- signUpAndLogInAsAdmin(userSignup, userEndpoint)
         (createdUser, authorization) = loginResp
-        userToUpdate = createdUser.copy(lastName = Some(createdUser.lastName.get.reverse))
-        updateUser <- PUT(userToUpdate, Uri.unsafeFromString(s"/users/${createdUser.userName}"))
+        userToUpdate =
+          createdUser.copy(lastName = Some(createdUser.lastName.get.reverse))
+        updateUser <- PUT(
+          userToUpdate,
+          Uri.unsafeFromString(s"/users/${createdUser.userName}")
+        )
         updateUserAuth = updateUser.putHeaders(authorization.get)
         updateResponse <- userEndpoint.run(updateUserAuth)
         updatedUser <- updateResponse.as[User]
@@ -81,7 +87,8 @@ class UserEndpointsSpec
       (for {
         loginResp <- signUpAndLogInAsAdmin(userSignup, userEndpoint)
         (createdUser, authorization) = loginResp
-        getRequest <- GET(Uri.unsafeFromString(s"/users/${createdUser.userName}"))
+        getRequest <-
+          GET(Uri.unsafeFromString(s"/users/${createdUser.userName}"))
         getRequestAuth = getRequest.putHeaders(authorization.get)
         getResponse <- userEndpoint.run(getRequestAuth)
         getUser <- getResponse.as[User]
@@ -99,7 +106,8 @@ class UserEndpointsSpec
       (for {
         loginResp <- signUpAndLogInAsCustomer(userSignup, userEndpoint)
         (createdUser, Some(authorization)) = loginResp
-        deleteRequest <- DELETE(Uri.unsafeFromString(s"/users/${createdUser.userName}"))
+        deleteRequest <-
+          DELETE(Uri.unsafeFromString(s"/users/${createdUser.userName}"))
         deleteRequestAuth = deleteRequest.putHeaders(authorization)
         deleteResponse <- userEndpoint.run(deleteRequestAuth)
       } yield deleteResponse.status shouldEqual Unauthorized).unsafeRunSync()
@@ -109,10 +117,12 @@ class UserEndpointsSpec
       (for {
         loginResp <- signUpAndLogInAsAdmin(userSignup, userEndpoint)
         (createdUser, Some(authorization)) = loginResp
-        deleteRequest <- DELETE(Uri.unsafeFromString(s"/users/${createdUser.userName}"))
+        deleteRequest <-
+          DELETE(Uri.unsafeFromString(s"/users/${createdUser.userName}"))
         deleteRequestAuth = deleteRequest.putHeaders(authorization)
         deleteResponse <- userEndpoint.run(deleteRequestAuth)
-        getRequest <- GET(Uri.unsafeFromString(s"/users/${createdUser.userName}"))
+        getRequest <-
+          GET(Uri.unsafeFromString(s"/users/${createdUser.userName}"))
         getRequestAuth = getRequest.putHeaders(authorization)
         getResponse <- userEndpoint.run(getRequestAuth)
       } yield {
@@ -123,4 +133,3 @@ class UserEndpointsSpec
     }
   }
 }
-
