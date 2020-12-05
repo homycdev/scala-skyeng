@@ -1,6 +1,8 @@
 package io.gitlab.scp2020.skyeng.infrastructure.repository.helpers
 
-import doobie.{Get, Put}
+import java.time.LocalDateTime
+
+import doobie.{Get, Meta, Put}
 import io.circe.Json
 import io.gitlab.scp2020.skyeng.domain.courses.classes.ClassType.{
   Homework,
@@ -28,6 +30,14 @@ import io.gitlab.scp2020.skyeng.domain.courses.tasks.TaskType.{
   Reading,
   Vocabulary,
   Writing
+}
+import io.gitlab.scp2020.skyeng.domain.payment.TransactionStatus
+import io.gitlab.scp2020.skyeng.domain.payment.TransactionStatus.{
+  Absent,
+  CorporalAccural,
+  LessonCompleted,
+  Replenishment,
+  Rescheduled
 }
 import io.gitlab.scp2020.skyeng.domain.users.teacher.QualificationType
 import io.gitlab.scp2020.skyeng.domain.users.teacher.QualificationType.{
@@ -118,11 +128,35 @@ object DoobieCustomMapping {
       case _             => ExerciseType.Other
     }
 
+  def toTransactionStatus(c: TransactionStatus): String =
+    c match {
+      case Replenishment           => "replenishment"
+      case LessonCompleted         => "lesson_completed"
+      case Rescheduled             => "rescheduled"
+      case Absent                  => "absent"
+      case CorporalAccural         => "corporal_accural"
+      case TransactionStatus.Other => "other"
+    }
+
+  def fromTransactionStatus(s: String): TransactionStatus =
+    s match {
+      case "replenishment"    => Replenishment
+      case "lesson_completed" => LessonCompleted
+      case "rescheduled"      => Rescheduled
+      case "absent"           => Absent
+      case "corporal_accural" => CorporalAccural
+      case _                  => TransactionStatus.Other
+    }
+
   object implicits {
     import doobie.postgres.circe.json.implicits._
+    import doobie.implicits.javatime.JavaTimeLocalDateTimeMeta
 
     implicit val jsonObjectGet: Get[Json] = jsonGet
     implicit val jsonObjectPut: Put[Json] = jsonPut
+
+    implicit val localDateTimeMeta: Meta[LocalDateTime] =
+      JavaTimeLocalDateTimeMeta
 
     implicit val classTypeGet: Get[ClassType] =
       Get[String].tmap(fromClassType)
@@ -143,5 +177,11 @@ object DoobieCustomMapping {
       Get[String].tmap(fromTaskType)
     implicit val taskTypePut: Put[TaskType] =
       Put[String].tcontramap(toTaskType)
+
+    implicit val transactionStatusGet: Get[TransactionStatus] =
+      Get[String].tmap(fromTransactionStatus)
+
+    implicit val transactionStatusPut: Put[TransactionStatus] =
+      Put[String].tcontramap(toTransactionStatus)
   }
 }
