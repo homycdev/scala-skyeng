@@ -39,6 +39,8 @@ import io.gitlab.scp2020.skyeng.domain.payment.TransactionStatus.{
   Replenishment,
   Rescheduled
 }
+import io.gitlab.scp2020.skyeng.domain.users.Role
+import io.gitlab.scp2020.skyeng.domain.users.Role.{Admin, Student, Teacher}
 import io.gitlab.scp2020.skyeng.domain.users.teacher.QualificationType
 import io.gitlab.scp2020.skyeng.domain.users.teacher.QualificationType.{
   NativeSpeaker,
@@ -46,6 +48,20 @@ import io.gitlab.scp2020.skyeng.domain.users.teacher.QualificationType.{
 }
 
 object DoobieCustomMapping {
+  def toRole(c: Role): String =
+    c match {
+      case Admin   => "admin"
+      case Teacher => "teacher"
+      case _       => "student"
+    }
+
+  def fromRole(s: String): Role =
+    s match {
+      case "teacher" => Teacher
+      case "admin"   => Admin
+      case _         => Student
+    }
+
   def toClassType(c: ClassType): String =
     c match {
       case Lesson          => "lesson"
@@ -149,14 +165,24 @@ object DoobieCustomMapping {
     }
 
   object implicits {
-    import doobie.postgres.circe.json.implicits._
     import doobie.implicits.javatime.JavaTimeLocalDateTimeMeta
+    import doobie.postgres.circe.json.implicits._
 
     implicit val jsonObjectGet: Get[Json] = jsonGet
     implicit val jsonObjectPut: Put[Json] = jsonPut
 
     implicit val localDateTimeMeta: Meta[LocalDateTime] =
       JavaTimeLocalDateTimeMeta
+
+    implicit val roleGet: Get[Role] =
+      Get[String].tmap(fromRole)
+    implicit val rolePut: Put[Role] =
+      Put[String].tcontramap(toRole)
+
+    implicit val qualificationTypeGet: Get[QualificationType] =
+      Get[String].tmap(fromQualificationType)
+    implicit val qualificationTypePut: Put[QualificationType] =
+      Put[String].tcontramap(toQualificationType)
 
     implicit val classTypeGet: Get[ClassType] =
       Get[String].tmap(fromClassType)
