@@ -10,6 +10,11 @@ import io.gitlab.scp2020.skyeng.domain.courses.exercises.Exercise
 import io.gitlab.scp2020.skyeng.domain.courses.tasks.Task
 import io.gitlab.scp2020.skyeng.domain.courses.vocabulary.Word
 import io.gitlab.scp2020.skyeng.domain.courses.{Course, CourseCategory}
+import io.gitlab.scp2020.skyeng.domain.results.{
+  ClassResult,
+  ExerciseResult,
+  TaskResult
+}
 import io.gitlab.scp2020.skyeng.domain.payment.Transaction
 import io.gitlab.scp2020.skyeng.domain.users.User
 import io.gitlab.scp2020.skyeng.domain.users.student.StudentProfile
@@ -18,6 +23,7 @@ import io.gitlab.scp2020.skyeng.domain.users.teacher.TeacherProfile
 // ENUM class
 sealed trait ValidationError extends Product with Serializable
 
+// users module
 case object UserAlreadyExists extends ValidationError
 
 case class UserAlreadyExistsError(user: User) extends ValidationError
@@ -37,6 +43,7 @@ case class StudentAlreadyExistsError(student: StudentProfile)
 
 case object StudentNotFoundError extends ValidationError
 
+// courses module
 case class CourseCategoryAlreadyExistsError(category: CourseCategory)
     extends ValidationError
 
@@ -45,6 +52,10 @@ case object CourseCategoryNotFoundError extends ValidationError
 case class CourseAlreadyExistsError(course: Course) extends ValidationError
 
 case object CourseNotFoundError extends ValidationError
+
+case class EnrollmentAlreadyExistsError(course: Course) extends ValidationError
+
+case object EnrollmentNotFoundError extends ValidationError
 
 case class WordAlreadyExistsError(word: Word) extends ValidationError
 
@@ -78,6 +89,23 @@ case class HomeworkAlreadyExistsError(homework: Homework)
 
 case object HomeworkNotFoundError extends ValidationError
 
+// results module
+case class ClassResultAlreadyExistsError(result: ClassResult)
+    extends ValidationError
+
+case object ClassResultNotFoundError extends ValidationError
+
+case class TaskResultAlreadyExistsError(result: TaskResult)
+    extends ValidationError
+
+case object TaskResultNotFoundError extends ValidationError
+
+case class ExerciseResultAlreadyExistsError(result: ExerciseResult)
+    extends ValidationError
+
+case object ExerciseResultNotFoundError extends ValidationError
+
+// payment module
 case class TransactionAlreadyExistsError(transaction: Transaction)
     extends ValidationError
 

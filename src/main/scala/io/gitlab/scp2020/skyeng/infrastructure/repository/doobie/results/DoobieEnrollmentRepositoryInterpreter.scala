@@ -6,7 +6,7 @@ import cats.implicits.catsSyntaxOptionId
 import cats.syntax.all._
 import doobie._
 import doobie.implicits.{toSqlInterpolator, _}
-import io.gitlab.scp2020.skyeng.domain.results.{
+import io.gitlab.scp2020.skyeng.domain.courses.{
   Enrollment,
   EnrollmentRepositoryAlgebra
 }
