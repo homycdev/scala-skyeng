@@ -7,7 +7,8 @@ import cats.data.OptionT
 import cats.implicits._
 import io.gitlab.scp2020.skyeng.domain.courses.classes.{
   Class,
-  ClassRepositoryAlgebra
+  ClassRepositoryAlgebra,
+  ClassType
 }
 import tsec.authentication.IdentityStore
 
@@ -48,6 +49,15 @@ class ClassRepositoryInMemoryInterpreter[F[_]: Applicative]
 
   def getByCourseId(courseId: Long): F[List[Class]] =
     cache.values.filter(u => u.courseId.contains(courseId)).toList.pure[F]
+
+  def getByCourseIdAndClassType(
+      courseId: Long,
+      classType: ClassType
+  ): F[List[Class]] =
+    cache.values
+      .filter(u => u.courseId.contains(courseId) && u.classType == classType)
+      .toList
+      .pure[F]
 }
 
 object ClassRepositoryInMemoryInterpreter {

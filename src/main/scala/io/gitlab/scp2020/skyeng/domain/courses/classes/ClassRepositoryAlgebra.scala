@@ -14,4 +14,9 @@ trait ClassRepositoryAlgebra[F[_]] {
   def list(pageSize: Int, offset: Int): F[List[Class]]
 
   def getByCourseId(courseId: Long): F[List[Class]]
+
+  def getByCourseIdAndClassType(
+      courseId: Long,
+      classType: ClassType
+  ): F[List[Class]]
 }

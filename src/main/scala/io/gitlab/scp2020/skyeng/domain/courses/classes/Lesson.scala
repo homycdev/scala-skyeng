@@ -1,11 +1,9 @@
 package io.gitlab.scp2020.skyeng.domain.courses.classes
 
-case class Class(
+case class Lesson(
     id: Option[Long],
     title: String,
     courseId: Option[Long],
-    classType: ClassType,
-    lessonId: Option[Long],
     difficulty: LevelType,
     listPosition: Int
 )

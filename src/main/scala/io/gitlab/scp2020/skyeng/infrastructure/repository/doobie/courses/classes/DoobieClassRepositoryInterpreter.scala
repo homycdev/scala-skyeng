@@ -8,7 +8,8 @@ import doobie._
 import doobie.implicits.{toSqlInterpolator, _}
 import io.gitlab.scp2020.skyeng.domain.courses.classes.{
   Class,
-  ClassRepositoryAlgebra
+  ClassRepositoryAlgebra,
+  ClassType
 }
 import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.SQLPagination.paginate
 import io.gitlab.scp2020.skyeng.infrastructure.repository.helpers.DoobieCustomMapping.implicits._
@@ -17,15 +18,15 @@ import tsec.authentication.IdentityStore
 private object ClassSQL {
   def insert(classObj: Class): Update0 =
     sql"""
-    INSERT INTO class (course_id, type, lesson_id, difficulty, list_position)
-    VALUES (${classObj.courseId}, ${classObj.classType}, ${classObj.lessonId}, 
+    INSERT INTO class (title, course_id, type, lesson_id, difficulty, list_position)
+    VALUES (${classObj.title}, ${classObj.courseId}, ${classObj.classType}, ${classObj.lessonId}, 
     ${classObj.difficulty}, ${classObj.listPosition})
   """.update
 
   def update(classObj: Class, id: Long): Update0 =
     sql"""
     UPDATE class
-    SET course_id = ${classObj.courseId}, type = ${classObj.classType}, 
+    SET title = ${classObj.title}, course_id = ${classObj.courseId}, type = ${classObj.classType}, 
     lesson_id = ${classObj.lessonId}, difficulty = ${classObj.difficulty}, 
     list_position = ${classObj.listPosition}
     WHERE id = $id
@@ -33,7 +34,7 @@ private object ClassSQL {
 
   def select(classId: Long): Query0[Class] =
     sql"""
-    SELECT id, course_id, type, lesson_id, difficulty, list_position
+    SELECT id, title, course_id, type, lesson_id, difficulty, list_position
     FROM class
     WHERE id = $classId
     ORDER BY list_position
@@ -46,16 +47,27 @@ private object ClassSQL {
 
   def selectAll: Query0[Class] =
     sql"""
-    SELECT id, course_id, type, lesson_id, difficulty, list_position
+    SELECT id, title, course_id, type, lesson_id, difficulty, list_position
     FROM class
     ORDER BY list_position
   """.query[Class]
 
   def selectByCourseId(courseId: Long): Query0[Class] =
     sql"""
-    SELECT id, course_id, type, lesson_id, difficulty, list_position
+    SELECT id, title, course_id, type, lesson_id, difficulty, list_position
     FROM class
     WHERE course_id = $courseId
+    ORDER BY list_position
+  """.query[Class]
+
+  def selectByCourseIdAndClassType(
+      courseId: Long,
+      classType: ClassType
+  ): Query0[Class] =
+    sql"""
+    SELECT id, title, course_id, type, lesson_id, difficulty, list_position
+    FROM class
+    WHERE course_id = $courseId AND type = $classType
     ORDER BY list_position
   """.query[Class]
 }
@@ -92,6 +104,12 @@ class DoobieClassRepositoryInterpreter[F[_]: Bracket[*[_], Throwable]](
 
   def getByCourseId(courseId: Long): F[List[Class]] =
     selectByCourseId(courseId).to[List].transact(xa)
+
+  def getByCourseIdAndClassType(
+      courseId: Long,
+      classType: ClassType
+  ): F[List[Class]] =
+    selectByCourseIdAndClassType(courseId, classType).to[List].transact(xa)
 }
 
 object DoobieClassRepositoryInterpreter {
