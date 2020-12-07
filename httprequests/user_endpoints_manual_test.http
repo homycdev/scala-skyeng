@@ -4,9 +4,9 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "userName": "testUser5",
-  "firstName": "TestName",
-  "lastName": "TestLastname",
+  "userName": "testUser6",
+  "firstName": "User 6",
+  "lastName": "Ya posle decouplings heh",
   "birthDate": "",
   "gender": "",
   "email": "test@test.com",
@@ -21,7 +21,7 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "userName": "testUser5",
+  "userName": "testUser4",
   "password": "testpassword"
 }
 
@@ -33,29 +33,39 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "userName": "admin",
-  "password": "admin"
+  "userName": "testUser",
+  "password": "testpassword"
 }
 
 ### Dont forget to fetch token
 
 ### Let's change the name of testUser5
-POST http://0.0.0.0:8080/users/testUser5
+PUT http://0.0.0.0:8080/users/testUser
 Content-Type: application/json
 Accept: application/json
-Authorization: Bearer yourtoken
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MDczNzYzMTAsImlhdCI6MTYwNzM3MjcxMCwianRpIjoiNDQ1MDJiMmQ4OTAxYjg4ZGY5NzU5MmUyMmU2NDM2YWMifQ.l3kC_FPMu_3eRPE2ey_TsCUIQ7Xowod7bw8XZLXfY3A
 
 {
-  "userName": "testUser5",
-  "firstName": "NotTestName"
+  "userName" : "updatedUser",
+  "firstName" : "",
+  "lastName" :  "",
+  "birthDate" : "",
+  "gender" :  "",
+  "email" : "newemail@test.com",
+  "hash" :  "",
+  "phone" : "",
+  "role" :  "",
+  "created" : "",
+  "id" :  ""
 }
 
 ### Let's see what have happened to testUser5
 
-GET http://0.0.0.0:8080/users/testUser5
+DELETE http://0.0.0.0:8080/users/testUser6
 Content-Type: application/json
 Accept: application/json
-Authorization: Bearer yourtoken
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MDczNzYzMTAsImlhdCI6MTYwNzM3MjcxMCwianRpIjoiNDQ1MDJiMmQ4OTAxYjg4ZGY5NzU5MmUyMmU2NDM2YWMifQ.l3kC_FPMu_3eRPE2ey_TsCUIQ7Xowod7bw8XZLXfY3A
 
 
 
+###

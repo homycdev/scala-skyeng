@@ -4,6 +4,7 @@ import cats.effect.{ConcurrentEffect, ContextShift, Resource, Timer, _}
 import doobie.util.ExecutionContexts
 import io.circe.config.parser
 import io.gitlab.scp2020.skyeng.config.{DatabaseConfig, SkyEngConfig}
+import io.gitlab.scp2020.skyeng.controllers.UserController
 import io.gitlab.scp2020.skyeng.domain.authentication.Auth
 import io.gitlab.scp2020.skyeng.domain.users.teacher.{
   TeacherProfileService,
@@ -64,15 +65,21 @@ object SkyengServer extends IOApp {
         Auth.jwtAuthenticator[F, HMACSHA256](key, authRepo, userRepo)
       routeAuth = SecuredRequestHandler(authenticator)
 
+      // Controllers
+      userController = UserController[F, BCrypt, HMACSHA256](
+        userService,
+        BCrypt.syncPasswordHasher[F],
+        routeAuth.authenticator
+      )
+
       httpApp = Router(
         "/users" -> UserEndpoints
           .endpoints[F, BCrypt, HMACSHA256](
-            userService,
-            BCrypt.syncPasswordHasher[F],
-            routeAuth
+            routeAuth,
+            userController
           ),
         "/teachers" -> TeacherProfileEndpoints
-          .endpoints[F, HMACSHA256](teacherService,userService, routeAuth)
+          .endpoints[F, HMACSHA256](teacherService, userService, routeAuth)
       ).orNotFound
 
       _ <- Resource.liftF(DatabaseConfig.initDb(conf.db))

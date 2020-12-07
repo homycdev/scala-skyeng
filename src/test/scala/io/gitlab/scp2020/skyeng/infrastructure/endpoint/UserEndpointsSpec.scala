@@ -4,6 +4,7 @@ package endpoint
 
 import _root_.io.gitlab.scp2020.skyeng.SkyEngArbitraries._
 import _root_.io.gitlab.scp2020.skyeng.domain.authentication._
+import _root_.io.gitlab.scp2020.skyeng.controllers._
 import _root_.io.gitlab.scp2020.skyeng.domain.users._
 import _root_.io.gitlab.scp2020.skyeng.infrastructure.endpoints._
 import _root_.io.gitlab.scp2020.skyeng.infrastructure.repository.inmemory.users._
@@ -37,10 +38,13 @@ class UserEndpointsSpec
     val key = HMACSHA256.unsafeGenerateKey
     val jwtAuth =
       JWTAuthenticator.unbacked.inBearerToken(1.day, None, userRepo, key)
-    val usersEndpoint = UserEndpoints.endpoints(
-      userService,
+
+    val userController = UserController(userService,
       BCrypt.syncPasswordHasher[IO],
-      SecuredRequestHandler(jwtAuth)
+      SecuredRequestHandler(jwtAuth).authenticator)
+    val usersEndpoint = UserEndpoints.endpoints(
+      SecuredRequestHandler(jwtAuth),
+      userController
     )
     Router(("/users", usersEndpoint)).orNotFound
   }

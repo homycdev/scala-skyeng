@@ -19,7 +19,6 @@ class TeacherProfileValidationInterpreter[F[_]: Applicative](
       .map(TeacherAlreadyExistsError)
       .toLeft(())
 
-  // TODO review this getOrElse statement.
 
   override def teacherExists(
       teacherId: Option[Long]
