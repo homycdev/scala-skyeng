@@ -5,7 +5,7 @@ import java.util.Random
 import cats.Applicative
 import cats.data.OptionT
 import cats.implicits._
-import io.gitlab.scp2020.skyeng.domain.results.{
+import io.gitlab.scp2020.skyeng.domain.courses.{
   Enrollment,
   EnrollmentRepositoryAlgebra
 }

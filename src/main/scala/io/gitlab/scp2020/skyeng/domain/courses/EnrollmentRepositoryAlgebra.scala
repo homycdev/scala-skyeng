@@ -1,4 +1,4 @@
-package io.gitlab.scp2020.skyeng.domain.results
+package io.gitlab.scp2020.skyeng.domain.courses
 
 import cats.data.OptionT
 
