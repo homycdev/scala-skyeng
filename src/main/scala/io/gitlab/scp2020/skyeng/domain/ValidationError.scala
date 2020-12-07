@@ -10,6 +10,7 @@ import io.gitlab.scp2020.skyeng.domain.courses.exercises.Exercise
 import io.gitlab.scp2020.skyeng.domain.courses.tasks.Task
 import io.gitlab.scp2020.skyeng.domain.courses.vocabulary.Word
 import io.gitlab.scp2020.skyeng.domain.courses.{Course, CourseCategory}
+import io.gitlab.scp2020.skyeng.domain.payment.Transaction
 import io.gitlab.scp2020.skyeng.domain.users.User
 import io.gitlab.scp2020.skyeng.domain.users.student.StudentProfile
 import io.gitlab.scp2020.skyeng.domain.users.teacher.TeacherProfile
@@ -76,3 +77,8 @@ case class HomeworkAlreadyExistsError(homework: Homework)
     extends ValidationError
 
 case object HomeworkNotFoundError extends ValidationError
+
+case class TransactionAlreadyExistsError(transaction: Transaction)
+    extends ValidationError
+
+case object TransactionNotFoundError extends ValidationError
