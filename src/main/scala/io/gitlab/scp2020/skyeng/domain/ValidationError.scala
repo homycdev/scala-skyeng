@@ -16,6 +16,7 @@ import io.gitlab.scp2020.skyeng.domain.results.{
   TaskResult
 }
 import io.gitlab.scp2020.skyeng.domain.payment.Transaction
+import io.gitlab.scp2020.skyeng.domain.schedule.{Room, Schedule}
 import io.gitlab.scp2020.skyeng.domain.users.User
 import io.gitlab.scp2020.skyeng.domain.users.student.StudentProfile
 import io.gitlab.scp2020.skyeng.domain.users.teacher.TeacherProfile
@@ -110,3 +111,13 @@ case class TransactionAlreadyExistsError(transaction: Transaction)
     extends ValidationError
 
 case object TransactionNotFoundError extends ValidationError
+
+// schedule module
+case class RoomAlreadyExistsError(room: Room) extends ValidationError
+
+case object RoomNotFoundError extends ValidationError
+
+case class ScheduleAlreadyExistsError(schedule: Schedule)
+    extends ValidationError
+
+case object ScheduleNotFoundError extends ValidationError
