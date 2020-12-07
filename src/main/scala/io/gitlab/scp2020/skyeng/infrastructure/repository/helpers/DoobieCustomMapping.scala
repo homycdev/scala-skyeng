@@ -4,48 +4,19 @@ import java.time.LocalDateTime
 
 import doobie.{Get, Meta, Put}
 import io.circe.Json
-import io.gitlab.scp2020.skyeng.domain.courses.classes.ClassType.{
-  Homework,
-  Lesson
-}
-import io.gitlab.scp2020.skyeng.domain.courses.classes.LevelType.{
-  Advanced,
-  Beginner,
-  Elementary,
-  Intermediate,
-  PreIntermediate,
-  UpperIntermediate
-}
+import io.gitlab.scp2020.skyeng.domain.courses.classes.ClassType.{Homework, Lesson}
+import io.gitlab.scp2020.skyeng.domain.courses.classes.LevelType.{Advanced, Beginner, Elementary, Intermediate, PreIntermediate, UpperIntermediate}
 import io.gitlab.scp2020.skyeng.domain.courses.classes.{ClassType, LevelType}
 import io.gitlab.scp2020.skyeng.domain.courses.exercises.ExerciseType
-import io.gitlab.scp2020.skyeng.domain.courses.exercises.ExerciseType.{
-  FillBlanks,
-  Match,
-  TrueFalse
-}
+import io.gitlab.scp2020.skyeng.domain.courses.exercises.ExerciseType.{FillBlanks, Match, TrueFalse}
 import io.gitlab.scp2020.skyeng.domain.courses.tasks.TaskType
-import io.gitlab.scp2020.skyeng.domain.courses.tasks.TaskType.{
-  Grammar,
-  Listening,
-  Reading,
-  Vocabulary,
-  Writing
-}
+import io.gitlab.scp2020.skyeng.domain.courses.tasks.TaskType.{Grammar, Listening, Reading, Vocabulary, Writing}
 import io.gitlab.scp2020.skyeng.domain.payment.TransactionStatus
-import io.gitlab.scp2020.skyeng.domain.payment.TransactionStatus.{
-  Absent,
-  CorporalAccural,
-  LessonCompleted,
-  Replenishment,
-  Rescheduled
-}
+import io.gitlab.scp2020.skyeng.domain.payment.TransactionStatus.{Absent, CorporalAccural, LessonCompleted, Replenishment, Rescheduled}
 import io.gitlab.scp2020.skyeng.domain.users.Role
 import io.gitlab.scp2020.skyeng.domain.users.Role.{Admin, Student, Teacher}
 import io.gitlab.scp2020.skyeng.domain.users.teacher.QualificationType
-import io.gitlab.scp2020.skyeng.domain.users.teacher.QualificationType.{
-  NativeSpeaker,
-  NotNativeSpeaker
-}
+import io.gitlab.scp2020.skyeng.domain.users.teacher.QualificationType.{NativeSpeaker, NotNativeSpeaker}
 
 object DoobieCustomMapping {
   def toRole(c: Role): String =
@@ -170,6 +141,11 @@ object DoobieCustomMapping {
 
     implicit val jsonObjectGet: Get[Json] = jsonGet
     implicit val jsonObjectPut: Put[Json] = jsonPut
+
+
+    import doobie.implicits.javasql.TimestampMeta
+    implicit val JavaTimeInstantMeta: Meta[java.time.Instant] =
+      TimestampMeta.imap(_.toInstant)(java.sql.Timestamp.from)
 
     implicit val localDateTimeMeta: Meta[LocalDateTime] =
       JavaTimeLocalDateTimeMeta

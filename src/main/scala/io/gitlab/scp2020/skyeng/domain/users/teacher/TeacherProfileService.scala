@@ -35,6 +35,8 @@ class TeacherProfileService[F[_]](
       _ <- validation.teacherExists(Some(teacher.userId))
       saved <- teacherRepo.update(teacher).toRight(TeacherNotFoundError)
     } yield saved
+  def list(pageSize: Int, offset: Int): F[List[TeacherProfile]] =
+    teacherRepo.list(pageSize, offset)
 }
 
 object TeacherProfileService {

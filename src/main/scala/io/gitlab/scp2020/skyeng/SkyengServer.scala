@@ -5,13 +5,23 @@ import doobie.util.ExecutionContexts
 import io.circe.config.parser
 import io.gitlab.scp2020.skyeng.config.{DatabaseConfig, SkyEngConfig}
 import io.gitlab.scp2020.skyeng.domain.authentication.Auth
+import io.gitlab.scp2020.skyeng.domain.users.teacher.{
+  TeacherProfileService,
+  TeacherProfileValidationInterpreter
+}
 import io.gitlab.scp2020.skyeng.domain.users.{
   UserService,
   UserValidationInterpreter
 }
-import io.gitlab.scp2020.skyeng.infrastructure.endpoints.UserEndpoints
+import io.gitlab.scp2020.skyeng.infrastructure.endpoints.{
+  TeacherProfileEndpoints,
+  UserEndpoints
+}
 import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.DoobieAuthRepositoryInterpreter
-import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.users.DoobieUserRepositoryInterpreter
+import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.users.{
+  DoobieTeacherProfileRepositoryInterpreter,
+  DoobieUserRepositoryInterpreter
+}
 import org.http4s.implicits.http4sKleisliResponseSyntaxOptionT
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.server.{Router, Server => H4Server}
@@ -40,12 +50,14 @@ object SkyengServer extends IOApp {
       // Repositories init
       userRepo = DoobieUserRepositoryInterpreter[F](xa)
       authRepo = DoobieAuthRepositoryInterpreter[F, HMACSHA256](key, xa)
-
+      teacherRepo = DoobieTeacherProfileRepositoryInterpreter[F](xa)
       // Validations init
       userValidation = UserValidationInterpreter[F](userRepo)
+      teacherValidation = TeacherProfileValidationInterpreter[F](teacherRepo)
 
       // Services init
       userService = UserService[F](userRepo, userValidation)
+      teacherService = TeacherProfileService[F](teacherRepo, teacherValidation)
 
       // Authenticator
       authenticator =
@@ -58,7 +70,9 @@ object SkyengServer extends IOApp {
             userService,
             BCrypt.syncPasswordHasher[F],
             routeAuth
-          )
+          ),
+        "/teachers" -> TeacherProfileEndpoints
+          .endpoints[F, HMACSHA256](teacherService,userService, routeAuth)
       ).orNotFound
 
       _ <- Resource.liftF(DatabaseConfig.initDb(conf.db))

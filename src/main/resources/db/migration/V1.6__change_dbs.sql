@@ -1,0 +1,1 @@
+alter table "user" alter column birth_date type varchar(10)

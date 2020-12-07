@@ -24,7 +24,7 @@ private object TeacherProfileSQL {
   def update(profile: TeacherProfile, id: Long): Update0 =
     sql"""
     UPDATE teacher_profile
-    SET user_id = ${profile.userId}, bio = ${profile.bio},
+    SET bio = ${profile.bio},
     greeting = ${profile.greeting}, qualification = ${profile.qualification}
     WHERE user_id = $id
   """.update

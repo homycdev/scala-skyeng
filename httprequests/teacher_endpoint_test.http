@@ -1,0 +1,11 @@
+POST http://0.0.0.0:8080/teachers/assign/3
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MDcyODYwMTYsImlhdCI6MTYwNzI4MjQxNiwianRpIjoiMWUzNzFhM2IxMmI2ZTg0ZmQxYzIzMDJiZTg5YjI5ZGQifQ.FnyOVstAMpq__tt5HLho9pzMAmVic7vflP4neKPoc_8
+
+{
+  "userId": 3,
+  "bio": "Ja jesm debil",
+  "greeting": "Nu kak vi, potomoki?",
+  "qualification": "native_speaker"
+}

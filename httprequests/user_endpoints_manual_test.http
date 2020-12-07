@@ -1,0 +1,61 @@
+### We have created testUser(assume id = 5)
+POST http://0.0.0.0:8080/users
+Content-Type: application/json
+Accept: application/json
+
+{
+  "userName": "testUser5",
+  "firstName": "TestName",
+  "lastName": "TestLastname",
+  "birthDate": "",
+  "gender": "",
+  "email": "test@test.com",
+  "password": "testpassword",
+  "phone": "",
+  "role": "student"
+}
+
+### Login as user. Dont forget to fetch the token
+POST http://0.0.0.0:8080/users/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "userName": "testUser5",
+  "password": "testpassword"
+}
+
+
+
+### Now let's get in as admin. You should always have admin created in your DB with role admin
+POST http://0.0.0.0:8080/users/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "userName": "admin",
+  "password": "admin"
+}
+
+### Dont forget to fetch token
+
+### Let's change the name of testUser5
+POST http://0.0.0.0:8080/users/testUser5
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer yourtoken
+
+{
+  "userName": "testUser5",
+  "firstName": "NotTestName"
+}
+
+### Let's see what have happened to testUser5
+
+GET http://0.0.0.0:8080/users/testUser5
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer yourtoken
+
+
+

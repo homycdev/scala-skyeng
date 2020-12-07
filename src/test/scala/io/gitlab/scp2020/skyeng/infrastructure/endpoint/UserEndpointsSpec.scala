@@ -2,15 +2,15 @@ package io.gitlab.scp2020.skyeng
 package infrastructure
 package endpoint
 
-import cats.effect._
-import org.http4s._
-import org.http4s.dsl._
 import _root_.io.gitlab.scp2020.skyeng.SkyEngArbitraries._
 import _root_.io.gitlab.scp2020.skyeng.domain.authentication._
 import _root_.io.gitlab.scp2020.skyeng.domain.users._
 import _root_.io.gitlab.scp2020.skyeng.infrastructure.endpoints._
 import _root_.io.gitlab.scp2020.skyeng.infrastructure.repository.inmemory.users._
+import cats.effect._
+import org.http4s._
 import org.http4s.client.dsl.Http4sClientDsl
+import org.http4s.dsl._
 import org.http4s.implicits._
 import org.http4s.server.Router
 import org.scalatest.enablers.Definition.definitionOfOption
@@ -72,7 +72,6 @@ class UserEndpointsSpec
         updateResponse <- userEndpoint.run(updateUserAuth)
         updatedUser <- updateResponse.as[User]
       } yield {
-        //TODO REVIEW wrapping to option. I dont like it, to be honest.
         updateResponse.status shouldEqual Ok
         updatedUser.lastName shouldEqual Some(createdUser.lastName.get.reverse)
         createdUser.id shouldEqual updatedUser.id

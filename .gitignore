@@ -3,10 +3,11 @@
 .idea
 .metals
 .vscode
-.env
 target
 project/target
 project/.bloop
 project/project/target
 project/project/project/target
 project/project/.bloop
+/.env
+/.bloop/
