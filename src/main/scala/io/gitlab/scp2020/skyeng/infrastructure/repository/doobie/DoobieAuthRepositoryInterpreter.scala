@@ -13,14 +13,15 @@ import tsec.common.SecureRandomId
 import tsec.jws.JWSSerializer
 import tsec.jws.mac.{JWSMacCV, JWSMacHeader, JWTMacImpure}
 import tsec.mac.jca.{MacErrorM, MacSigningKey}
+import io.gitlab.scp2020.skyeng.infrastructure.repository.helpers.DoobieCustomMapping.implicits._
 
 private object AuthSQL {
-  import doobie.implicits.javatime._
+//  import doobie.implicits.javatime._
   implicit val secureRandomIdPut: Put[SecureRandomId] =
     Put[String].contramap((_: Id[SecureRandomId]).widen)
 
   def insert[A](jwt: AugmentedJWT[A, Long])(implicit hs: JWSSerializer[JWSMacHeader[A]]): Update0 =
-    sql"""INSERT INTO JWT (ID, JWT, IDENTITY, EXPIRY, LAST_TOUCHED)
+    sql"""INSERT INTO JWT ("id","jwt","identity","expiry","last_touched")
           VALUES (${jwt.id}, ${jwt.jwt.toEncodedString}, ${jwt.identity}, ${jwt.expiry}, ${jwt.lastTouched})
        """.update
 

@@ -41,6 +41,7 @@ object DatabaseConfig {
           .configure()
           .dataSource(config.url, config.user, config.password)
           .load()
+      flyWay.repair()
       flyWay.migrate()
     }.as(())
 

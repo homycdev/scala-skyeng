@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS "user"
 
 CREATE TABLE IF NOT EXISTS "jwt"
 (
-    "id"           BIGSERIAL PRIMARY KEY,
+    "id"           varchar PRIMARY KEY,
     "jwt"          VARCHAR   NOT NULL,
     "identity"     BIGINT    NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
     "expiry"       TIMESTAMP NOT NULL,

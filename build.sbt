@@ -14,7 +14,7 @@ val CatsVersion = "2.2.0"
 val CirceVersion = "0.13.0"
 val CirceGenericExVersion = "0.13.0"
 val CirceConfigVersion = "0.8.0"
-val DoobieVersion = "0.9.2"
+val DoobieVersion = "0.9.0"
 val EnumeratumCirceVersion = "1.6.1"
 
 val KindProjectorVersion = "0.11.0"
@@ -44,11 +44,15 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-generic-extras" % CirceGenericExVersion,
   "io.circe" %% "circe-parser" % CirceVersion,
   "io.circe" %% "circe-config" % CirceConfigVersion,
+  // Start with this one
   "org.tpolecat" %% "doobie-core" % DoobieVersion,
-  "org.tpolecat" %% "doobie-postgres" % "0.9.0",
-  "org.tpolecat" %% "doobie-scalatest" % DoobieVersion,
-  "org.tpolecat" %% "doobie-hikari" % DoobieVersion,
-  "org.tpolecat" %% "doobie-postgres-circe" % DoobieVersion,
+  // And add any of these as needed
+  "org.tpolecat" %% "doobie-postgres-circe" % DoobieVersion, // H2 driver 1.4.200 + type mappings.
+  "org.tpolecat" %% "doobie-hikari" % DoobieVersion, // HikariCP transactor.
+  "org.tpolecat" %% "doobie-postgres" % DoobieVersion, // Postgres driver 42.2.12 + type mappings.
+  "org.tpolecat" %% "doobie-quill" % DoobieVersion, // Support for Quill 3.5.1
+  "org.tpolecat" %% "doobie-specs2" % DoobieVersion % "test", // Specs2 support for typechecking statements.
+  "org.tpolecat" %% "doobie-scalatest" % DoobieVersion % "test", // ScalaTest support for typechecking statements.
   "com.beachape" %% "enumeratum-circe" % EnumeratumCirceVersion,
   "org.http4s" %% "http4s-blaze-server" % Http4sVersion,
   "org.http4s" %% "http4s-blaze-client" % Http4sVersion % Test,

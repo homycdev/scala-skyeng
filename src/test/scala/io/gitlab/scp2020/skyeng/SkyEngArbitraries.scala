@@ -1,9 +1,10 @@
 package io.gitlab.scp2020.skyeng
 
-import java.time.Instant
+import java.time.{Instant, LocalDateTime}
 
 import cats.effect.IO
 import io.gitlab.scp2020.skyeng.domain.authentication.SignupRequest
+import io.gitlab.scp2020.skyeng.domain.users.teacher.{QualificationType, TeacherProfile}
 import io.gitlab.scp2020.skyeng.domain.users.{Role, _}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
@@ -15,7 +16,8 @@ import tsec.mac.jca._
 
 trait SkyEngArbitraries {
   val userNameLength = 16
-  val userNameGen: Gen[String] = Gen.listOfN(userNameLength, Gen.alphaChar).map(_.mkString)
+  val userNameGen: Gen[String] =
+    Gen.listOfN(userNameLength, Gen.alphaChar).map(_.mkString)
   val optionString: Gen[Option[String]] = Gen.some(arbitrary[String])
 
   implicit val instant: Arbitrary[Instant] = Arbitrary[Instant] {
@@ -24,7 +26,11 @@ trait SkyEngArbitraries {
     } yield Instant.ofEpochMilli(millis)
   }
 
-  implicit val role: Arbitrary[Role] = Arbitrary[Role](Gen.oneOf(Role.values.toIndexedSeq))
+  implicit val role: Arbitrary[Role] =
+    Arbitrary[Role](Gen.oneOf(Role.values.toIndexedSeq))
+
+  implicit val qualificationType: Arbitrary[QualificationType] =
+    Arbitrary[QualificationType](Gen.oneOf(QualificationType.values))
 
   implicit val user: Arbitrary[User] = Arbitrary[User] {
     for {
@@ -49,20 +55,10 @@ trait SkyEngArbitraries {
       password,
       phone,
       role,
-        id = id)
+      id = id,
+      created = LocalDateTime.now()
+    )
 
-  }
-
-  case class AdminUser(value: User)
-
-  case class CustomerUser(value: User)
-
-  implicit val adminUser: Arbitrary[AdminUser] = Arbitrary {
-    user.arbitrary.map(user => AdminUser(user.copy(role = Role.Admin)))
-  }
-
-  implicit val customerUser: Arbitrary[CustomerUser] = Arbitrary {
-    user.arbitrary.map(user => CustomerUser(user.copy(role = Role.Student)))
   }
 
   implicit val userSignup: Arbitrary[SignupRequest] = Arbitrary[SignupRequest] {
@@ -86,19 +82,20 @@ trait SkyEngArbitraries {
       email,
       password,
       phone,
-      role,
-      )
+      role
+    )
   }
 
-  implicit val secureRandomId: Arbitrary[SecureRandomId] = Arbitrary[SecureRandomId] {
-    arbitrary[String].map(SecureRandomId.apply)
-  }
+  implicit val secureRandomId: Arbitrary[SecureRandomId] =
+    Arbitrary[SecureRandomId] {
+      arbitrary[String].map(SecureRandomId.apply)
+    }
 
   implicit val jwtMac: Arbitrary[JWTMac[HMACSHA256]] = Arbitrary {
     for {
       key <- Gen.const(HMACSHA256.unsafeGenerateKey)
       claims <- Gen.finiteDuration.map(exp =>
-        JWTClaims.withDuration[IO](expiration = Some(exp)).unsafeRunSync(),
+        JWTClaims.withDuration[IO](expiration = Some(exp)).unsafeRunSync()
       )
     } yield JWTMacImpure
       .build[HMACSHA256](claims, key)
@@ -106,9 +103,9 @@ trait SkyEngArbitraries {
   }
 
   implicit def augmentedJWT[A, I](implicit
-                                  arb1: Arbitrary[JWTMac[A]],
-                                  arb2: Arbitrary[I],
-                                 ): Arbitrary[AugmentedJWT[A, I]] =
+      arb1: Arbitrary[JWTMac[A]],
+      arb2: Arbitrary[I]
+  ): Arbitrary[AugmentedJWT[A, I]] =
     Arbitrary {
       for {
         id <- arbitrary[SecureRandomId]
@@ -118,6 +115,41 @@ trait SkyEngArbitraries {
         lastTouched <- Gen.option(arbitrary[Instant])
       } yield AugmentedJWT(id, jwt, identity, expiry, lastTouched)
     }
+
+  implicit val teacher: Arbitrary[TeacherProfile] = Arbitrary[TeacherProfile]{
+    for {
+      id <- Gen.posNum[Long]
+      bio <- arbitrary[String]
+      greeting <- arbitrary[String]
+      qualification <- arbitrary[QualificationType]
+    } yield TeacherProfile(id, bio, greeting, qualification)
+  }
+
+
+  case class AdminUser(value: User)
+
+  case class StudentUser(value: User)
+
+  implicit val adminUser: Arbitrary[AdminUser] = Arbitrary {
+    user.arbitrary.map(user => AdminUser(user.copy(role = Role.Admin, id = Some(1L))))
+  }
+
+  implicit val studentUser: Arbitrary[StudentUser] = Arbitrary {
+    user.arbitrary.map(user => StudentUser(user.copy(role = Role.Student, id = Some(2L))))
+  }
+
+  implicit val studentUser2: Arbitrary[User] = Arbitrary{
+    user.arbitrary.map(user => user.copy(id = Some(3L), role = Role.Student))
+  }
+
+  implicit val teacherUser: Arbitrary[TeacherProfile] = Arbitrary{
+    teacher.arbitrary.map(teacher => teacher.copy(userId = 4L))
+  }
+
+  implicit val userTeacher: Arbitrary[User] = Arbitrary{
+    user.arbitrary.map(user => user.copy(id = Some(4L), role = Role.Teacher))
+  }
+
 }
 
 object SkyEngArbitraries extends SkyEngArbitraries

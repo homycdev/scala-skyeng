@@ -1,5 +1,7 @@
 package io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.users
 
+import java.time.LocalDateTime
+
 import cats.data.OptionT
 import cats.effect.Bracket
 import cats.implicits.catsSyntaxOptionId
@@ -14,9 +16,9 @@ import tsec.authentication.IdentityStore
 private object UserSQL {
   def insert(user: User): Update0 =
     sql"""
-    INSERT INTO "user" (user_name, first_name, last_name, birth_date, gender, 
+    INSERT INTO "user" (user_name, first_name, last_name, birth_date, gender,
     email, hash, phone_number, role, created)
-    VALUES (${user.userName}, ${user.firstName}, ${user.lastName}, ${user.birthDate}, 
+    VALUES (${user.userName}, ${user.firstName}, ${user.lastName}, ${user.birthDate},
     ${user.gender}, ${user.email}, ${user.hash}, ${user.phone}, ${user.role}, ${user.created})
   """.update
 
@@ -64,8 +66,8 @@ class DoobieUserRepositoryInterpreter[F[_]: Bracket[*[_], Throwable]](
 
   def create(user: User): F[User] =
     insert(user)
-      .withUniqueGeneratedKeys[Long]("ID")
-      .map(id => user.copy(id = id.some))
+      .withUniqueGeneratedKeys[Long]("id")
+      .map(id => user.copy(id = id.some, created = LocalDateTime.now()))
       .transact(xa)
 
   def update(user: User): OptionT[F, User] =

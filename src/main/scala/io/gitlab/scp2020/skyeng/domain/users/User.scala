@@ -1,7 +1,5 @@
 package io.gitlab.scp2020.skyeng.domain.users
 
-//import java.time.LocalDateTime
-
 import java.time.LocalDateTime
 
 import cats.Applicative
@@ -17,7 +15,7 @@ case class User(
                  hash: String,
                  phone: Option[String] = None,
                  role: Role = Role("Student"),
-                 created: LocalDateTime = LocalDateTime.now(),
+                 created: LocalDateTime,
                  id: Option[Long] = None,
                )
 
