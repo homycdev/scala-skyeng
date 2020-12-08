@@ -74,6 +74,7 @@ docker-compose logs -f
 ## Testing
 Application preruns the written into `test` package tests on gitlab CI/CD
 
+In the test module of the applicaiton we are running tests basing on the 
 
 
 

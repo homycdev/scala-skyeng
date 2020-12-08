@@ -5,11 +5,24 @@ import cats.syntax.all._
 import io.circe.generic.auto._
 import io.circe.syntax._
 import io.gitlab.scp2020.skyeng.domain.authentication.Auth
-import io.gitlab.scp2020.skyeng.domain.users.teacher.{TeacherProfile, TeacherProfileService}
+import io.gitlab.scp2020.skyeng.domain.users.teacher.{
+  TeacherProfile,
+  TeacherProfileService
+}
 import io.gitlab.scp2020.skyeng.domain.users.{Role, User, UserService}
-import io.gitlab.scp2020.skyeng.domain.{TeacherAlreadyExistsError, TeacherNotFoundError, UserNotFoundError}
-import io.gitlab.scp2020.skyeng.infrastructure.endpoint.{AuthEndpoint, AuthService}
-import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.Pagination.{OptionalOffsetMatcher, OptionalPageSizeMatcher}
+import io.gitlab.scp2020.skyeng.domain.{
+  TeacherAlreadyExistsError,
+  TeacherNotFoundError,
+  UserNotFoundError
+}
+import io.gitlab.scp2020.skyeng.infrastructure.endpoint.{
+  AuthEndpoint,
+  AuthService
+}
+import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.Pagination.{
+  OptionalOffsetMatcher,
+  OptionalPageSizeMatcher
+}
 import org.http4s._
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
@@ -38,9 +51,10 @@ class TeacherProfileEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
       Auth.teacherOnly {
         updateTeacherProfileEndpoint(teacherProfileService)
       }
-    auth.liftService(adminEndpoints) <+> auth.liftService(teacherEndpoints)
+    auth.liftService(teacherEndpoints) <+> auth.liftService(adminEndpoints)
   }
 
+  // TODO SET all error messages to the same value as they correspond to error class
   private def setUserAsTeacherEndpoint(
       teacherProfileService: TeacherProfileService[F],
       userService: UserService[F]
@@ -72,7 +86,7 @@ class TeacherProfileEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
             case Right(saved)            => Ok(saved.asJson)
             case Left(UserNotFoundError) => NotFound("User not found")
           }
-        case Left(UserNotFoundError) => NotFound("The user was not found!")
+        case Left(UserNotFoundError) => NotFound("User not found")
       }
 
   }
@@ -90,25 +104,33 @@ class TeacherProfileEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
   private def updateTeacherProfileEndpoint(
       teacherProfileService: TeacherProfileService[F]
   ): AuthEndpoint[F, Auth] = {
-    case req @ PUT -> Root / LongVar(id) asAuthed _ =>
-      val action =
-        for {
-          teacher <- req.request.as[TeacherProfile]
-          updated = teacher.copy(
-            bio = teacher.bio,
-            greeting = teacher.greeting,
-            qualification = teacher.qualification
-          )
-          result <- teacherProfileService.updateTeacher(updated).value
-        } yield result
+    case req @ POST -> Root / "update" / LongVar(id) asAuthed _ =>
+      teacherProfileService.getTeacher(id).value.flatMap {
+        case Right(foundTeacher) =>
+          val action = {
+            for {
+              teacher <- req.request.as[TeacherProfile]
+              updated = teacher.copy(
+                userId = foundTeacher.userId,
+                bio = teacher.bio,
+                greeting = teacher.greeting,
+                qualification = foundTeacher.qualification
+              )
+              result <- teacherProfileService.updateTeacher(updated).value
+            } yield result
+          }
+          action.flatMap {
+            case Right(saved) => Ok(saved.asJson)
+            case Left(TeacherNotFoundError) =>
+              NotFound(
+                s"Teacher with given id: $id not found."
+              )
+          }
 
-      action.flatMap {
-        case Right(saved) => Ok(saved.asJson)
         case Left(TeacherNotFoundError) =>
-          NotFound(
-            s"Teacher with given id: $id not found."
-          )
+          NotFound(s"Teacher with given id: $id not found.")
       }
+
   }
 
   private def deleteTeacherProfileEndpoint(

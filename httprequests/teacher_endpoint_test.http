@@ -1,11 +1,23 @@
-POST http://0.0.0.0:8080/teachers/assign/3
+POST http://0.0.0.0:8080/teachers/assign/4
 Content-Type: application/json
 Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MDcyODYwMTYsImlhdCI6MTYwNzI4MjQxNiwianRpIjoiMWUzNzFhM2IxMmI2ZTg0ZmQxYzIzMDJiZTg5YjI5ZGQifQ.FnyOVstAMpq__tt5HLho9pzMAmVic7vflP4neKPoc_8
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MDczODA0MTYsImlhdCI6MTYwNzM3NjgxNiwianRpIjoiYTFjZjA0OWVjZDA0NzhmZmY0NDhlNmRlMmNiYTE5NDAifQ.O9y68L0Z9C9N0VHP7ZbKpRr3TwTlj-AwiAIvsWHWYTM
 
 {
-  "userId": 3,
-  "bio": "Ja jesm debil",
-  "greeting": "Nu kak vi, potomoki?",
-  "qualification": "native_speaker"
+  "userId": 10,
+  "bio": "Ja ne debil, a umniy",
+  "greeting": "Nu kak vi, potomoki? Ya upnulsya",
+  "qualification": "not_native_speaker"
+}
+###
+POST http://0.0.0.0:8080/teachers/
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MDczODExMDYsImlhdCI6MTYwNzM3NzUwNiwianRpIjoiMTRjMDhhYzkyZjkzZDU3Nzk1NjBkMDFjMDkxYmQ3N2IifQ.rE1jEeFpfbGSE5NnpaxZ7NaodD0CcIE59O6XtUGrrjs
+
+{
+  "userId" : 10,
+  "bio": "Ja ne debil, a umniy",
+  "greeting": "Nu kak vi, potomoki? Ya upnulsya",
+  "qualification": "not_native_speaker"
 }

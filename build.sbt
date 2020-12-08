@@ -80,11 +80,11 @@ addCompilerPlugin(
     .cross(CrossVersion.full)
 )
 enablePlugins(
-  ScalafmtPlugin,
+//  ScalafmtPlugin,
   JavaAppPackaging,
-  GhpagesPlugin,
-  MicrositesPlugin,
-  TutPlugin,
+//  GhpagesPlugin,
+//  MicrositesPlugin,
+//  TutPlugin,
   AssemblyPlugin
 )
 enablePlugins(DockerPlugin, JavaAppPackaging, AshScriptPlugin)
