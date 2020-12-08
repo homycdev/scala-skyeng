@@ -1,4 +1,4 @@
-package io.gitlab.scp2020.skyeng.infrastructure.endpoints
+package io.gitlab.scp2020.skyeng.infrastructure.endpoints.courses
 
 import cats.effect.Sync
 import cats.syntax.all._
@@ -87,5 +87,4 @@ object EnrollmentEndpoints {
   ): HttpRoutes[F] =
     new EnrollmentEndpoints[F, Auth]
       .endpoints(enrollmentService, auth)
-
 }

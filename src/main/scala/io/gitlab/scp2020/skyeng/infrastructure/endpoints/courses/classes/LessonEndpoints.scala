@@ -1,4 +1,5 @@
-package io.gitlab.scp2020.skyeng.infrastructure.endpoints
+package io.gitlab.scp2020.skyeng.infrastructure.endpoints.courses.classes
+
 import cats.effect.Sync
 import cats.syntax.all._
 import io.circe.generic.auto._
@@ -64,10 +65,10 @@ class LessonEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
           action.flatMap {
             case Right(saved) => Ok(saved.asJson)
             case Left(LessonNotFoundError) =>
-              NotFound(s"Lesson with id: ${id} not found")
+              NotFound(s"Lesson with id: $id not found")
           }
         case Left(LessonNotFoundError) =>
-          NotFound(s"Lesson with id: ${id} not found")
+          NotFound(s"Lesson with id: $id not found")
       }
   }
 
@@ -79,10 +80,10 @@ class LessonEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
         case Right(_) =>
           for {
             _ <- lessonService.deleteLesson(id)
-            res <- Ok(s"Successfully deleted lesson: ${id}")
+            res <- Ok(s"Successfully deleted lesson: $id")
           } yield res
         case Left(LessonNotFoundError) =>
-          NotFound(s"Lesson with id: ${id} not found")
+          NotFound(s"Lesson with id: $id not found")
       }
   }
 

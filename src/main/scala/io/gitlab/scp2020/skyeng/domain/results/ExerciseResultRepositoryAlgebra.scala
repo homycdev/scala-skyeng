@@ -16,4 +16,9 @@ trait ExerciseResultRepositoryAlgebra[F[_]] {
   def getByStudentId(studentId: Long): F[List[ExerciseResult]]
 
   def getByExerciseId(exerciseId: Long): F[List[ExerciseResult]]
+
+  def getByStudentIdAndExerciseId(
+      studentId: Long,
+      exerciseId: Long
+  ): F[List[ExerciseResult]]
 }

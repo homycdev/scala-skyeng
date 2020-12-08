@@ -1,9 +1,10 @@
 package io.gitlab.scp2020.skyeng.domain.authentication
 
-import java.time.LocalDateTime
-
+import io.circe.Json
 import io.gitlab.scp2020.skyeng.domain.users.{Role, User}
 import tsec.passwordhashers.PasswordHash
+
+import java.time.LocalDateTime
 
 final case class LoginRequest(
     userName: String,
@@ -19,7 +20,7 @@ final case class SignupRequest(
     email: String,
     password: String,
     phone: Option[String] = None,
-    role: Role = Role("Student"),
+    role: Role = Role("Student")
 ) {
   def asUser[A](hashedPassword: PasswordHash[A]): User =
     User(
@@ -30,8 +31,16 @@ final case class SignupRequest(
       hash = hashedPassword,
       phone = phone,
       role = role,
-      created =  LocalDateTime.now(),
+      created = LocalDateTime.now(),
       birthDate = birthDate,
       gender = gender
     )
 }
+
+final case class ReplenishRequest(
+    amount: Int
+)
+
+final case class ExerciseResultRequest(
+    content: Json
+)

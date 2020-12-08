@@ -47,7 +47,7 @@ class TransactionService[F[_]](
   ): F[List[Transaction]] =
     transactionRepositoryAlgebra.list(pageSize, offset)
 
-  def getTasksByStudentId(studentId: Long): F[List[Transaction]] =
+  def getTransactionsByStudentId(studentId: Long): F[List[Transaction]] =
     transactionRepositoryAlgebra.getByStudentId(studentId)
 }
 

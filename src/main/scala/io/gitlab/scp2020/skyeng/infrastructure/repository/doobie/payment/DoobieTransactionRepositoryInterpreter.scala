@@ -47,6 +47,7 @@ private object TransactionSQL {
     sql"""
     SELECT id, student_id, teacher_id, created, status, change, reminder
     FROM transaction
+    ORDER BY created
   """.query[Transaction]
 
   def selectByStudentId(studentId: Long): Query0[Transaction] =
@@ -54,6 +55,7 @@ private object TransactionSQL {
     SELECT id, student_id, teacher_id, created, status, change, reminder
     FROM transaction
     WHERE student_id = $studentId
+    ORDER BY created
   """.query[Transaction]
 }
 

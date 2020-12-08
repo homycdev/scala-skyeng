@@ -51,4 +51,17 @@ class ExerciseResultService[F[_]](
       exerciseId: Long
   ): F[List[ExerciseResult]] =
     resultRepositoryAlgebra.getByExerciseId(exerciseId)
+
+  def getExerciseResultByStudentIdAndExerciseId(
+      studentId: Long,
+      exerciseId: Long
+  ): F[List[ExerciseResult]] =
+    resultRepositoryAlgebra.getByStudentIdAndExerciseId(studentId, exerciseId)
+}
+
+object ExerciseResultService {
+  def apply[F[_]](
+      resultRepositoryAlgebra: ExerciseResultRepositoryAlgebra[F]
+  ): ExerciseResultService[F] =
+    new ExerciseResultService(resultRepositoryAlgebra)
 }
