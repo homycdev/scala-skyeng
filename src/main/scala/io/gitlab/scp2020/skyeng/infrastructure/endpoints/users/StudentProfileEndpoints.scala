@@ -1,13 +1,19 @@
-package io.gitlab.scp2020.skyeng.infrastructure.endpoints
+package io.gitlab.scp2020.skyeng.infrastructure.endpoints.users
 
 import cats.effect.Sync
 import cats.syntax.all._
 import io.circe.generic.auto._
 import io.circe.syntax._
-import io.gitlab.scp2020.skyeng.domain.{StudentAlreadyExistsError, StudentNotFoundError}
 import io.gitlab.scp2020.skyeng.domain.authentication.Auth
 import io.gitlab.scp2020.skyeng.domain.users.User
-import io.gitlab.scp2020.skyeng.domain.users.student.{StudentProfile, StudentProfileService}
+import io.gitlab.scp2020.skyeng.domain.users.student.{
+  StudentProfile,
+  StudentProfileService
+}
+import io.gitlab.scp2020.skyeng.domain.{
+  StudentAlreadyExistsError,
+  StudentNotFoundError
+}
 import io.gitlab.scp2020.skyeng.infrastructure.endpoint.AuthEndpoint
 import org.http4s._
 import org.http4s.circe._
@@ -30,7 +36,7 @@ class StudentProfileEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
       Auth.allRolesHandler(
         setStudentProfileEndpoint(studentProfileService)
       ) {
-        Auth.adminOnly{
+        Auth.adminOnly {
           deleteStudentProfileEndpoint(studentProfileService)
             .orElse(searchStudentProfileEndpoint(studentProfileService))
         }
@@ -69,8 +75,8 @@ class StudentProfileEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
   }
 
   private def searchStudentProfileEndpoint(
-                                            studentService: StudentProfileService[F]
-                                          ): AuthEndpoint[F, Auth] = {
+      studentService: StudentProfileService[F]
+  ): AuthEndpoint[F, Auth] = {
     case GET -> Root / LongVar(id) asAuthed _ =>
       studentService.getStudent(id).value.flatMap {
         case Right(found)               => Ok(found.asJson)
@@ -89,10 +95,10 @@ class StudentProfileEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
   }
 
 }
-object StudentProfileEndpoints{
+object StudentProfileEndpoints {
   def endpoints[F[_]: Sync, Auth: JWTMacAlgo](
-                                               studentProfileService: StudentProfileService[F],
-                                               auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
-                                             ): HttpRoutes[F] =
-    new StudentProfileEndpoints[F,Auth].endpoints(studentProfileService, auth)
+      studentProfileService: StudentProfileService[F],
+      auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
+  ): HttpRoutes[F] =
+    new StudentProfileEndpoints[F, Auth].endpoints(studentProfileService, auth)
 }

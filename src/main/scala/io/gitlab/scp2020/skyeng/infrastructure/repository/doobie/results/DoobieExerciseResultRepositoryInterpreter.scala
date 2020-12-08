@@ -60,6 +60,16 @@ private object ExerciseResultSQL {
     FROM exercise_result
     WHERE exercise_id = $exerciseId
   """.query[ExerciseResult]
+
+  def selectByStudentIdAndExerciseId(
+      studentId: Long,
+      exerciseId: Long
+  ): Query0[ExerciseResult] =
+    sql"""
+    SELECT id, student_id, exercise_id, score, content 
+    FROM exercise_result
+    WHERE student_id = $studentId AND exercise_id = $exerciseId
+  """.query[ExerciseResult]
 }
 
 class DoobieExerciseResultRepositoryInterpreter[F[_]: Bracket[*[_], Throwable]](
@@ -97,6 +107,12 @@ class DoobieExerciseResultRepositoryInterpreter[F[_]: Bracket[*[_], Throwable]](
 
   def getByExerciseId(exerciseId: Long): F[List[ExerciseResult]] =
     selectByExerciseId(exerciseId).to[List].transact(xa)
+
+  def getByStudentIdAndExerciseId(
+      studentId: Long,
+      exerciseId: Long
+  ): F[List[ExerciseResult]] =
+    selectByStudentIdAndExerciseId(studentId, exerciseId).to[List].transact(xa)
 }
 
 object DoobieExerciseResultRepositoryInterpreter {

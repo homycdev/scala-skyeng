@@ -1,26 +1,37 @@
 package io.gitlab.scp2020.skyeng.infrastructure.endpoint
 
-
-import cats.syntax.all._
 import cats.effect._
+import cats.syntax.all._
 import io.gitlab.scp2020.skyeng.domain.users._
 import org.http4s._
-import tsec.authentication.{AugmentedJWT, IdentityStore, JWTAuthenticator, SecuredRequestHandler, buildBearerAuthHeader}
+import tsec.authentication.{
+  AugmentedJWT,
+  IdentityStore,
+  JWTAuthenticator,
+  SecuredRequestHandler,
+  buildBearerAuthHeader
+}
 import tsec.jws.mac.{JWSMacCV, JWTMac}
 import tsec.mac.jca.HMACSHA256
 
 import scala.concurrent.duration._
 
-class AuthTest[F[_]: Sync](userRepo: UserRepositoryAlgebra[F] with IdentityStore[F, Long, User])(
-  implicit cv: JWSMacCV[F, HMACSHA256],
+class AuthTest[F[_]: Sync](
+    userRepo: UserRepositoryAlgebra[F] with IdentityStore[F, Long, User]
+)(implicit
+    cv: JWSMacCV[F, HMACSHA256]
 ) {
   private val symmetricKey = HMACSHA256.unsafeGenerateKey
   private val jwtAuth: JWTAuthenticator[F, Long, User, HMACSHA256] =
     JWTAuthenticator.unbacked.inBearerToken(1.day, None, userRepo, symmetricKey)
-  val securedRqHandler: SecuredRequestHandler[F, Long, User, AugmentedJWT[HMACSHA256, Long]] =
+  val securedRqHandler
+      : SecuredRequestHandler[F, Long, User, AugmentedJWT[HMACSHA256, Long]] =
     SecuredRequestHandler(jwtAuth)
 
-  private def embedInBearerToken(r: Request[F], a: AugmentedJWT[HMACSHA256, Long]): Request[F] =
+  private def embedInBearerToken(
+      r: Request[F],
+      a: AugmentedJWT[HMACSHA256, Long]
+  ): Request[F] =
     r.putHeaders {
       val stringify = JWTMac.toEncodedString(a.jwt)
       buildBearerAuthHeader(stringify)

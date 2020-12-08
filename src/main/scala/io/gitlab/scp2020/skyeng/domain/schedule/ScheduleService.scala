@@ -50,3 +50,10 @@ class ScheduleService[F[_]](
   def getSchedulesByTeacherId(teacherId: Long): F[List[Schedule]] =
     scheduleRepositoryAlgebra.getByTeacherId(teacherId)
 }
+
+object ScheduleService {
+  def apply[F[_]](
+      scheduleRepositoryAlgebra: ScheduleRepositoryAlgebra[F]
+  ): ScheduleService[F] =
+    new ScheduleService(scheduleRepositoryAlgebra)
+}

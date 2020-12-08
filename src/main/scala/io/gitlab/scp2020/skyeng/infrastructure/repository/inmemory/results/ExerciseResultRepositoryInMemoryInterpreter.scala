@@ -1,7 +1,5 @@
 package io.gitlab.scp2020.skyeng.infrastructure.repository.inmemory.results
 
-import java.util.Random
-
 import cats.Applicative
 import cats.data.OptionT
 import cats.implicits._
@@ -11,6 +9,7 @@ import io.gitlab.scp2020.skyeng.domain.results.{
 }
 import tsec.authentication.IdentityStore
 
+import java.util.Random
 import scala.collection.concurrent.TrieMap
 
 class ExerciseResultRepositoryInMemoryInterpreter[F[_]: Applicative]
@@ -51,6 +50,15 @@ class ExerciseResultRepositoryInMemoryInterpreter[F[_]: Applicative]
 
   def getByExerciseId(exerciseId: Long): F[List[ExerciseResult]] =
     cache.values.filter(u => u.exerciseId == exerciseId).toList.pure[F]
+
+  def getByStudentIdAndExerciseId(
+      studentId: Long,
+      exerciseId: Long
+  ): F[List[ExerciseResult]] =
+    cache.values
+      .filter(u => u.studentId == studentId && u.exerciseId == exerciseId)
+      .toList
+      .pure[F]
 }
 
 object ExerciseResultRepositoryInMemoryInterpreter {

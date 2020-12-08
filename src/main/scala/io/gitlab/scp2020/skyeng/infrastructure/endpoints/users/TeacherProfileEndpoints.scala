@@ -1,4 +1,4 @@
-package io.gitlab.scp2020.skyeng.infrastructure.endpoints
+package io.gitlab.scp2020.skyeng.infrastructure.endpoints.users
 
 import cats.effect.Sync
 import cats.syntax.all._

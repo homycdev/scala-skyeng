@@ -1,10 +1,11 @@
 package io.gitlab.scp2020.skyeng
 
-import java.time.{Instant, LocalDateTime}
-
 import cats.effect.IO
 import io.gitlab.scp2020.skyeng.domain.authentication.SignupRequest
-import io.gitlab.scp2020.skyeng.domain.users.teacher.{QualificationType, TeacherProfile}
+import io.gitlab.scp2020.skyeng.domain.users.teacher.{
+  QualificationType,
+  TeacherProfile
+}
 import io.gitlab.scp2020.skyeng.domain.users.{Role, _}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
@@ -13,6 +14,8 @@ import tsec.common.SecureRandomId
 import tsec.jws.mac._
 import tsec.jwt.JWTClaims
 import tsec.mac.jca._
+
+import java.time.{Instant, LocalDateTime}
 
 trait SkyEngArbitraries {
   val userNameLength = 16
@@ -116,7 +119,7 @@ trait SkyEngArbitraries {
       } yield AugmentedJWT(id, jwt, identity, expiry, lastTouched)
     }
 
-  implicit val teacher: Arbitrary[TeacherProfile] = Arbitrary[TeacherProfile]{
+  implicit val teacher: Arbitrary[TeacherProfile] = Arbitrary[TeacherProfile] {
     for {
       id <- Gen.posNum[Long]
       bio <- arbitrary[String]
@@ -125,28 +128,31 @@ trait SkyEngArbitraries {
     } yield TeacherProfile(id, bio, greeting, qualification)
   }
 
-
   case class AdminUser(value: User)
 
   case class StudentUser(value: User)
 
   implicit val adminUser: Arbitrary[AdminUser] = Arbitrary {
-    user.arbitrary.map(user => AdminUser(user.copy(role = Role.Admin, id = Some(1L))))
+    user.arbitrary.map(user =>
+      AdminUser(user.copy(role = Role.Admin, id = Some(1L)))
+    )
   }
 
   implicit val studentUser: Arbitrary[StudentUser] = Arbitrary {
-    user.arbitrary.map(user => StudentUser(user.copy(role = Role.Student, id = Some(2L))))
+    user.arbitrary.map(user =>
+      StudentUser(user.copy(role = Role.Student, id = Some(2L)))
+    )
   }
 
-  implicit val studentUser2: Arbitrary[User] = Arbitrary{
+  implicit val studentUser2: Arbitrary[User] = Arbitrary {
     user.arbitrary.map(user => user.copy(id = Some(3L), role = Role.Student))
   }
 
-  implicit val teacherUser: Arbitrary[TeacherProfile] = Arbitrary{
+  implicit val teacherUser: Arbitrary[TeacherProfile] = Arbitrary {
     teacher.arbitrary.map(teacher => teacher.copy(userId = 4L))
   }
 
-  implicit val userTeacher: Arbitrary[User] = Arbitrary{
+  implicit val userTeacher: Arbitrary[User] = Arbitrary {
     user.arbitrary.map(user => user.copy(id = Some(4L), role = Role.Teacher))
   }
 

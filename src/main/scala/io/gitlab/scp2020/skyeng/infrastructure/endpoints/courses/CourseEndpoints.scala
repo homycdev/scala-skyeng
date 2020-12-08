@@ -1,4 +1,4 @@
-package io.gitlab.scp2020.skyeng.infrastructure.endpoints
+package io.gitlab.scp2020.skyeng.infrastructure.endpoints.courses
 
 import cats.effect.Sync
 import cats.syntax.all._
@@ -88,8 +88,8 @@ class CourseEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
     }
     auth.liftService(teacherAuthEndpoints)
   }
-
 }
+
 object CourseEndpoints {
   def endpoints[F[_]: Sync, Auth: JWTMacAlgo](
       courseService: CourseService[F],

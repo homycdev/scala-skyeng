@@ -6,6 +6,13 @@ import io.circe.config.parser
 import io.gitlab.scp2020.skyeng.config.{DatabaseConfig, SkyEngConfig}
 import io.gitlab.scp2020.skyeng.controllers.UserController
 import io.gitlab.scp2020.skyeng.domain.authentication.Auth
+import io.gitlab.scp2020.skyeng.domain.payment.TransactionService
+import io.gitlab.scp2020.skyeng.domain.results.ExerciseResultService
+import io.gitlab.scp2020.skyeng.domain.schedule.ScheduleService
+import io.gitlab.scp2020.skyeng.domain.users.student.{
+  StudentProfileService,
+  StudentProfileValidationInterpreter
+}
 import io.gitlab.scp2020.skyeng.domain.users.teacher.{
   TeacherProfileService,
   TeacherProfileValidationInterpreter
@@ -14,12 +21,19 @@ import io.gitlab.scp2020.skyeng.domain.users.{
   UserService,
   UserValidationInterpreter
 }
-import io.gitlab.scp2020.skyeng.infrastructure.endpoints.{
+import io.gitlab.scp2020.skyeng.infrastructure.endpoints.payment.PaymentEndpoints
+import io.gitlab.scp2020.skyeng.infrastructure.endpoints.results.ResultEndpoints
+import io.gitlab.scp2020.skyeng.infrastructure.endpoints.schedule.ScheduleEndpoints
+import io.gitlab.scp2020.skyeng.infrastructure.endpoints.users.{
   TeacherProfileEndpoints,
   UserEndpoints
 }
 import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.DoobieAuthRepositoryInterpreter
+import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.payment.DoobieTransactionRepositoryInterpreter
+import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.results.DoobieExerciseResultRepositoryInterpreter
+import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.schedule.DoobieScheduleRepositoryInterpreter
 import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.users.{
+  DoobieStudentProfileRepositoryInterpreter,
   DoobieTeacherProfileRepositoryInterpreter,
   DoobieUserRepositoryInterpreter
 }
@@ -52,13 +66,23 @@ object SkyengServer extends IOApp {
       userRepo = DoobieUserRepositoryInterpreter[F](xa)
       authRepo = DoobieAuthRepositoryInterpreter[F, HMACSHA256](key, xa)
       teacherRepo = DoobieTeacherProfileRepositoryInterpreter[F](xa)
+      studentRepo = DoobieStudentProfileRepositoryInterpreter[F](xa)
+      transactionRepo = DoobieTransactionRepositoryInterpreter[F](xa)
+      exerciseResultRepo = DoobieExerciseResultRepositoryInterpreter[F](xa)
+      scheduleRepo = DoobieScheduleRepositoryInterpreter[F](xa)
+
       // Validations init
       userValidation = UserValidationInterpreter[F](userRepo)
       teacherValidation = TeacherProfileValidationInterpreter[F](teacherRepo)
+      studentValidation = StudentProfileValidationInterpreter[F](studentRepo)
 
       // Services init
       userService = UserService[F](userRepo, userValidation)
       teacherService = TeacherProfileService[F](teacherRepo, teacherValidation)
+      studentService = StudentProfileService[F](studentRepo, studentValidation)
+      transactionService = TransactionService[F](transactionRepo)
+      exerciseResultService = ExerciseResultService[F](exerciseResultRepo)
+      scheduleService = ScheduleService[F](scheduleRepo)
 
       // Authenticator
       authenticator =
@@ -79,7 +103,17 @@ object SkyengServer extends IOApp {
             userController
           ),
         "/teachers" -> TeacherProfileEndpoints
-          .endpoints[F, HMACSHA256](teacherService, userService, routeAuth)
+          .endpoints[F, HMACSHA256](teacherService, userService, routeAuth),
+        "/payment" -> PaymentEndpoints
+          .endpoints[F, HMACSHA256](
+            transactionService,
+            studentService,
+            routeAuth
+          ),
+        "/results" -> ResultEndpoints
+          .endpoints[F, HMACSHA256](exerciseResultService, routeAuth),
+        "/schedule" -> ScheduleEndpoints
+          .endpoints[F, HMACSHA256](scheduleService, routeAuth)
       ).orNotFound
 
       _ <- Resource.liftF(DatabaseConfig.initDb(conf.db))

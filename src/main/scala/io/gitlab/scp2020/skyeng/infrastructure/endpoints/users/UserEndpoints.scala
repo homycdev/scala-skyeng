@@ -1,4 +1,4 @@
-package io.gitlab.scp2020.skyeng.infrastructure.endpoints
+package io.gitlab.scp2020.skyeng.infrastructure.endpoints.users
 
 import cats.effect.Sync
 import cats.syntax.all._
@@ -35,9 +35,9 @@ class UserEndpoints[F[_]: Sync, A, Auth: JWTMacAlgo](
   ): HttpRoutes[F] = {
     val authEndpoints: AuthService[F, Auth] =
       Auth.adminOnly {
-        updateEndpoint
+        updateEndpoint()
           .orElse(searchByNameEndpoint)
-          .orElse(deleteUserEndpoint)
+          .orElse(deleteUserEndpoint())
           .orElse(listEndpoint)
       }
 
@@ -75,7 +75,7 @@ class UserEndpoints[F[_]: Sync, A, Auth: JWTMacAlgo](
         }
     }
 
-  private def updateEndpoint: AuthEndpoint[F, Auth] = {
+  private def updateEndpoint(): AuthEndpoint[F, Auth] = {
     case req @ PUT -> Root / name asAuthed _ =>
       val response = userController.update(req, name)
       response.flatMap {
@@ -107,7 +107,7 @@ class UserEndpoints[F[_]: Sync, A, Auth: JWTMacAlgo](
 
   }
 
-  private def deleteUserEndpoint: AuthEndpoint[F, Auth] = {
+  private def deleteUserEndpoint(): AuthEndpoint[F, Auth] = {
     case DELETE -> Root / userName asAuthed _ =>
       for {
         _ <- userController.deleteUser(userName)

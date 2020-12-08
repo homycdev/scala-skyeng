@@ -100,4 +100,22 @@ object Auth {
     )(
       pf
     )
+
+  private def _studentOnly[F[_], Auth](implicit
+      F: MonadError[F, Throwable]
+  ): BasicRBAC[F, Role, User, Auth] =
+    BasicRBAC[F, Role, User, Auth](Role.Admin, Role.Student)
+
+  def studentOnly[F[_], Auth](
+      pf: PartialFunction[SecuredRequest[F, User, AugmentedJWT[Auth, Long]], F[
+        Response[F]
+      ]]
+  )(implicit
+      F: MonadError[F, Throwable]
+  ): TSecAuthService[User, AugmentedJWT[Auth, Long], F] =
+    TSecAuthService.withAuthorization(
+      _studentOnly[F, AugmentedJWT[Auth, Long]]
+    )(
+      pf
+    )
 }
