@@ -1,20 +1,11 @@
 package io.gitlab.scp2020.skyeng.domain
 
-import io.gitlab.scp2020.skyeng.domain.courses.classes.{
-  Class,
-  ClassVocabulary,
-  Homework,
-  Lesson
-}
+import io.gitlab.scp2020.skyeng.domain.courses.classes.{Class, ClassVocabulary, Homework, Lesson}
 import io.gitlab.scp2020.skyeng.domain.courses.exercises.Exercise
 import io.gitlab.scp2020.skyeng.domain.courses.tasks.Task
 import io.gitlab.scp2020.skyeng.domain.courses.vocabulary.Word
-import io.gitlab.scp2020.skyeng.domain.courses.{Course, CourseCategory}
-import io.gitlab.scp2020.skyeng.domain.results.{
-  ClassResult,
-  ExerciseResult,
-  TaskResult
-}
+import io.gitlab.scp2020.skyeng.domain.courses.{Course, CourseCategory, Enrollment}
+import io.gitlab.scp2020.skyeng.domain.results.{ClassResult, ExerciseResult, TaskResult}
 import io.gitlab.scp2020.skyeng.domain.payment.Transaction
 import io.gitlab.scp2020.skyeng.domain.schedule.{Room, Schedule}
 import io.gitlab.scp2020.skyeng.domain.users.User
@@ -54,7 +45,7 @@ case class CourseAlreadyExistsError(course: Course) extends ValidationError
 
 case object CourseNotFoundError extends ValidationError
 
-case class EnrollmentAlreadyExistsError(course: Course) extends ValidationError
+case class EnrollmentAlreadyExistsError(enrollement: Enrollment) extends ValidationError
 
 case object EnrollmentNotFoundError extends ValidationError
 
