@@ -4,11 +4,11 @@ import cats.effect.{ConcurrentEffect, ContextShift, Resource, Timer, _}
 import doobie.util.ExecutionContexts
 import io.circe.config.parser
 import io.gitlab.scp2020.skyeng.config.{DatabaseConfig, SkyEngConfig}
-import io.gitlab.scp2020.skyeng.controllers.UserController
+import io.gitlab.scp2020.skyeng.controllers.{RoomController, UserController}
 import io.gitlab.scp2020.skyeng.domain.authentication.Auth
 import io.gitlab.scp2020.skyeng.domain.payment.TransactionService
 import io.gitlab.scp2020.skyeng.domain.results.ExerciseResultService
-import io.gitlab.scp2020.skyeng.domain.schedule.ScheduleService
+import io.gitlab.scp2020.skyeng.domain.schedule.{RoomService, ScheduleService}
 import io.gitlab.scp2020.skyeng.domain.users.student.{
   StudentProfileService,
   StudentProfileValidationInterpreter
@@ -25,13 +25,17 @@ import io.gitlab.scp2020.skyeng.infrastructure.endpoints.payment.PaymentEndpoint
 import io.gitlab.scp2020.skyeng.infrastructure.endpoints.results.ResultEndpoints
 import io.gitlab.scp2020.skyeng.infrastructure.endpoints.schedule.ScheduleEndpoints
 import io.gitlab.scp2020.skyeng.infrastructure.endpoints.users.{
+  StudentProfileEndpoints,
   TeacherProfileEndpoints,
   UserEndpoints
 }
 import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.DoobieAuthRepositoryInterpreter
 import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.payment.DoobieTransactionRepositoryInterpreter
 import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.results.DoobieExerciseResultRepositoryInterpreter
-import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.schedule.DoobieScheduleRepositoryInterpreter
+import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.schedule.{
+  DoobieRoomRepositoryInterpreter,
+  DoobieScheduleRepositoryInterpreter
+}
 import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.users.{
   DoobieStudentProfileRepositoryInterpreter,
   DoobieTeacherProfileRepositoryInterpreter,
@@ -70,6 +74,7 @@ object SkyengServer extends IOApp {
       transactionRepo = DoobieTransactionRepositoryInterpreter[F](xa)
       exerciseResultRepo = DoobieExerciseResultRepositoryInterpreter[F](xa)
       scheduleRepo = DoobieScheduleRepositoryInterpreter[F](xa)
+      roomRepo = DoobieRoomRepositoryInterpreter[F](xa)
 
       // Validations init
       userValidation = UserValidationInterpreter[F](userRepo)
@@ -83,6 +88,7 @@ object SkyengServer extends IOApp {
       transactionService = TransactionService[F](transactionRepo)
       exerciseResultService = ExerciseResultService[F](exerciseResultRepo)
       scheduleService = ScheduleService[F](scheduleRepo)
+      roomService = RoomService[F](roomRepo)
 
       // Authenticator
       authenticator =
@@ -95,6 +101,7 @@ object SkyengServer extends IOApp {
         BCrypt.syncPasswordHasher[F],
         routeAuth.authenticator
       )
+      roomController = RoomController[F](roomService)
 
       httpApp = Router(
         "/users" -> UserEndpoints
@@ -103,7 +110,14 @@ object SkyengServer extends IOApp {
             userController
           ),
         "/teachers" -> TeacherProfileEndpoints
-          .endpoints[F, HMACSHA256](teacherService, userService, routeAuth),
+          .endpoints[F, HMACSHA256](
+            teacherService,
+            userService,
+            roomController,
+            routeAuth
+          ),
+        "/students" -> StudentProfileEndpoints
+          .endpoints[F, HMACSHA256](studentService, roomController, routeAuth),
         "/payment" -> PaymentEndpoints
           .endpoints[F, HMACSHA256](
             transactionService,
