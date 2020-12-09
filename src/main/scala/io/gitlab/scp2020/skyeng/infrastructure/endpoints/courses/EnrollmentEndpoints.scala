@@ -29,17 +29,11 @@ class EnrollmentEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
   private def enrollEndpoint(
       enrollmentService: EnrollmentService[F]
   ): AuthEndpoint[F, Auth] = {
-    case req @ POST -> Root / "enroll" / "course" / LongVar(id) asAuthed user =>
+    case req @ POST -> Root asAuthed _ =>
       val action =
-        // Payload is needed to prevent user from his/her stupidity by putting wrong user id or course id
         for {
           enrollment <- req.request.as[Enrollment]
-          payload = enrollment.copy(
-            id = user.id,
-            studentId = user.id.get,
-            courseId = id
-          ) // TODO this is very stupid, but straightforward approach. Cant think of nothing better atm.
-          res <- enrollmentService.createEnrollment(payload).value
+          res <- enrollmentService.createEnrollment(enrollment).value
         } yield res
 
       action.flatMap {
@@ -71,7 +65,7 @@ class EnrollmentEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] = {
     val teacherAuthEndpoints: AuthService[F, Auth] =
-      Auth.teacherOnly {
+      Auth.allRoles {
         enrollEndpoint(enrollmentService)
           .orElse(deleteEnrollmentEndpoint(enrollmentService))
       }

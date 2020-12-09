@@ -46,7 +46,7 @@ class LessonEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
   private def updateLessonEndpoint(
       lessonService: LessonService[F]
   ): AuthEndpoint[F, Auth] = {
-    case req @ POST -> Root / "update" / "lesson" / LongVar(id) asAuthed _ =>
+    case req @ POST -> Root / "update" / LongVar(id) asAuthed _ =>
       lessonService.getLesson(id).value.flatMap {
         case Right(found) =>
           val action =
@@ -75,7 +75,7 @@ class LessonEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
   private def deleteLessonEndpoint(
       lessonService: LessonService[F]
   ): AuthEndpoint[F, Auth] = {
-    case DELETE -> Root / "lesson" / LongVar(id) asAuthed _ =>
+    case DELETE -> Root / LongVar(id) asAuthed _ =>
       lessonService.getLesson(id).value.flatMap {
         case Right(_) =>
           for {
@@ -85,6 +85,26 @@ class LessonEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
         case Left(LessonNotFoundError) =>
           NotFound(s"Lesson with id: $id not found")
       }
+  }
+
+  private def searchLessonEndpoint(
+      lessonService: LessonService[F]
+  ): AuthEndpoint[F, Auth] = {
+    case GET -> Root / LongVar(id) asAuthed _ =>
+      lessonService.getLesson(id).value.flatMap {
+        case Right(found)              => Ok(found.asJson)
+        case Left(LessonNotFoundError) => NotFound("The lesson not found")
+      }
+  }
+
+  def listLessonsEndpoint(
+      lessonService: LessonService[F]
+  ): AuthEndpoint[F, Auth] = {
+    case GET -> Root / "course" / LongVar(id) asAuthed _ =>
+      for {
+        retrieved <- lessonService.getLessonsByCourseId(id)
+        resp <- Ok(retrieved.asJson)
+      } yield resp
   }
 
   def endpoints(
@@ -97,7 +117,12 @@ class LessonEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
           .orElse(updateLessonEndpoint(lessonService))
           .orElse(deleteLessonEndpoint(lessonService))
       }
-    auth.liftService(teacherAuthEndpoints)
+    val authEndpoints: AuthService[F, Auth] =
+      Auth.allRoles {
+        listLessonsEndpoint(lessonService)
+          .orElse(searchLessonEndpoint(lessonService))
+      }
+    auth.liftService(teacherAuthEndpoints) <+> auth.liftService(authEndpoints)
   }
 }
 

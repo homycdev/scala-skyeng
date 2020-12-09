@@ -29,7 +29,7 @@ class HomeworkEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
   private def createHomeworkEndpoint(
       homeworkService: HomeworkService[F]
   ): AuthEndpoint[F, Auth] = {
-    case req @ POST -> Root / "homework" / "create" asAuthed _ =>
+    case req @ POST -> Root / "create" asAuthed _ =>
       val action =
         for {
           homework <- req.request.as[Homework]
@@ -48,7 +48,7 @@ class HomeworkEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
   private def deleteHomeworkEndpoint(
       homeworkService: HomeworkService[F]
   ): AuthEndpoint[F, Auth] = {
-    case DELETE -> Root / "homework" / LongVar(id) asAuthed _ =>
+    case DELETE -> Root / LongVar(id) asAuthed _ =>
       homeworkService.getHomework(id).value.flatMap {
         case Right(_) =>
           for {
@@ -60,6 +60,26 @@ class HomeworkEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
       }
   }
 
+  private def searchHomeworkEndpoint(
+      homeworkService: HomeworkService[F]
+  ): AuthEndpoint[F, Auth] = {
+    case GET -> Root / LongVar(id) asAuthed _ =>
+      homeworkService.getHomework(id).value.flatMap {
+        case Right(found)                => Ok(found.asJson)
+        case Left(HomeworkNotFoundError) => NotFound("The homework not found")
+      }
+  }
+
+  def listHomeworksEndpoint(
+      homeworkService: HomeworkService[F]
+  ): AuthEndpoint[F, Auth] = {
+    case GET -> Root / "course" / LongVar(id) asAuthed _ =>
+      for {
+        retrieved <- homeworkService.getHomeworksByCourseId(id)
+        resp <- Ok(retrieved.asJson)
+      } yield resp
+  }
+
   def endpoints(
       homeworkService: HomeworkService[F],
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
@@ -69,9 +89,13 @@ class HomeworkEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
         createHomeworkEndpoint(homeworkService)
           .orElse(deleteHomeworkEndpoint(homeworkService))
       }
-    auth.liftService(teacherAuthEndpoints)
+    val authEndpoints: AuthService[F, Auth] =
+      Auth.allRoles {
+        listHomeworksEndpoint(homeworkService)
+          .orElse(searchHomeworkEndpoint(homeworkService))
+      }
+    auth.liftService(teacherAuthEndpoints) <+> auth.liftService(authEndpoints)
   }
-
 }
 
 object HomeworkEndpoints {

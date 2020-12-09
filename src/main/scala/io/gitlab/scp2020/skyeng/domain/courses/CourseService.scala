@@ -46,6 +46,9 @@ class CourseService[F[_]](
       offset: Int
   ): F[List[Course]] =
     courseRepositoryAlgebra.list(pageSize, offset)
+
+  def getCoursesByCategoryId(categoryId: Long): F[List[Course]] =
+    courseRepositoryAlgebra.getByCategoryId(categoryId)
 }
 
 object CourseService {
