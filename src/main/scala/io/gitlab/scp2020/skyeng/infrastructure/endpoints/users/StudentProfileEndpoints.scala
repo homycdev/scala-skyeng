@@ -4,6 +4,7 @@ import cats.effect.Sync
 import cats.syntax.all._
 import io.circe.generic.auto._
 import io.circe.syntax._
+import io.gitlab.scp2020.skyeng.controllers.RoomController
 import io.gitlab.scp2020.skyeng.domain.authentication.Auth
 import io.gitlab.scp2020.skyeng.domain.users.User
 import io.gitlab.scp2020.skyeng.domain.users.student.{
@@ -21,7 +22,6 @@ import org.http4s.dsl.Http4sDsl
 import tsec.authentication._
 import tsec.jwt.algorithms.JWTMacAlgo
 
-// TODO work in progress. Need to implement CourseService
 class StudentProfileEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
     extends Http4sDsl[F] {
 
@@ -30,6 +30,7 @@ class StudentProfileEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
 
   def endpoints(
       studentProfileService: StudentProfileService[F],
+      roomController: RoomController[F],
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] = {
     val authEndpoints =
@@ -41,7 +42,11 @@ class StudentProfileEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
             .orElse(searchStudentProfileEndpoint(studentProfileService))
         }
       }
-    auth.liftService(authEndpoints)
+    val studentAuthEndpoints =
+      Auth.studentOnly {
+        getRoomOfStudentEndpoint(roomController)
+      }
+    auth.liftService(authEndpoints) <+> auth.liftService(studentAuthEndpoints)
   }
 
   // TODO Rewrite it.
@@ -94,11 +99,22 @@ class StudentProfileEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
       } yield resp
   }
 
+  private def getRoomOfStudentEndpoint(
+      roomController: RoomController[F]
+  ): AuthEndpoint[F, Auth] = {
+    case GET -> Root / "room" asAuthed student =>
+      for {
+        rooms <- roomController.getRoomsOfStudent(student.id.get)
+        res <- Ok(rooms.asJson)
+      } yield res
+  }
 }
 object StudentProfileEndpoints {
   def endpoints[F[_]: Sync, Auth: JWTMacAlgo](
       studentProfileService: StudentProfileService[F],
+      roomController: RoomController[F],
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] =
-    new StudentProfileEndpoints[F, Auth].endpoints(studentProfileService, auth)
+    new StudentProfileEndpoints[F, Auth]
+      .endpoints(studentProfileService, roomController, auth)
 }

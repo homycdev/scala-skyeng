@@ -4,6 +4,7 @@ import cats.effect.Sync
 import cats.syntax.all._
 import io.circe.generic.auto._
 import io.circe.syntax._
+import io.gitlab.scp2020.skyeng.controllers.RoomController
 import io.gitlab.scp2020.skyeng.domain.authentication.Auth
 import io.gitlab.scp2020.skyeng.domain.users.teacher.{
   TeacherProfile,
@@ -11,6 +12,7 @@ import io.gitlab.scp2020.skyeng.domain.users.teacher.{
 }
 import io.gitlab.scp2020.skyeng.domain.users.{Role, User, UserService}
 import io.gitlab.scp2020.skyeng.domain.{
+  RoomNotFoundError,
   TeacherAlreadyExistsError,
   TeacherNotFoundError,
   UserNotFoundError
@@ -37,6 +39,7 @@ class TeacherProfileEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
   def endpoints(
       teacherProfileService: TeacherProfileService[F],
       userService: UserService[F],
+      roomController: RoomController[F],
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] = {
     val adminEndpoints: AuthService[F, Auth] =
@@ -50,6 +53,9 @@ class TeacherProfileEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
     val teacherEndpoints =
       Auth.teacherOnly {
         updateTeacherProfileEndpoint(teacherProfileService)
+          .orElse(getRoomOfTeacherEndpoint(roomController))
+          .orElse(setRoomOpenEndpoint(roomController))
+          .orElse(setRoomClosedEndpoint(roomController))
       }
     auth.liftService(teacherEndpoints) <+> auth.liftService(adminEndpoints)
   }
@@ -158,14 +164,50 @@ class TeacherProfileEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
       } yield resp
   }
 
+  private def getRoomOfTeacherEndpoint(
+      roomController: RoomController[F]
+  ): AuthEndpoint[F, Auth] = {
+    case GET -> Root / "room" asAuthed teacher =>
+      for {
+        rooms <- roomController.getRoomsOfTeacher(teacher.id.get)
+        res <- Ok(rooms.asJson)
+      } yield res
+  }
+
+  private def setRoomOpenEndpoint(
+      roomController: RoomController[F]
+  ): AuthEndpoint[F, Auth] = {
+    case GET -> Root / "room/open" / LongVar(roomId) asAuthed _ =>
+      val action = roomController.setRoomActivity(roomId, isOpen = true)
+
+      action.flatMap {
+        case Right(saved) => Ok(saved.asJson)
+        case Left(RoomNotFoundError) =>
+          NotFound(s"Room with given id: $roomId not found.")
+      }
+  }
+
+  private def setRoomClosedEndpoint(
+      roomController: RoomController[F]
+  ): AuthEndpoint[F, Auth] = {
+    case GET -> Root / "room/open" / LongVar(roomId) asAuthed _ =>
+      val action = roomController.setRoomActivity(roomId, isOpen = false)
+
+      action.flatMap {
+        case Right(saved) => Ok(saved.asJson)
+        case Left(RoomNotFoundError) =>
+          NotFound(s"Room with given id: $roomId not found.")
+      }
+  }
 }
 
 object TeacherProfileEndpoints {
   def endpoints[F[_]: Sync, Auth: JWTMacAlgo](
       teacherProfileService: TeacherProfileService[F],
       userService: UserService[F],
+      roomController: RoomController[F],
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] =
     new TeacherProfileEndpoints[F, Auth]
-      .endpoints(teacherProfileService, userService, auth)
+      .endpoints(teacherProfileService, userService, roomController, auth)
 }
