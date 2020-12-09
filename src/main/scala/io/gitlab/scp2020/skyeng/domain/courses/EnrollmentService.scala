@@ -50,3 +50,10 @@ class EnrollmentService[F[_]](
   def getEnrollmentsByCourseId(courseId: Long): F[List[Enrollment]] =
     enrollmentRepositoryAlgebra.getByCourseId(courseId)
 }
+
+object EnrollmentService {
+  def apply[F[_]](
+      enrollmentRepositoryAlgebra: EnrollmentRepositoryAlgebra[F]
+  ): EnrollmentService[F] =
+    new EnrollmentService(enrollmentRepositoryAlgebra)
+}

@@ -29,7 +29,7 @@ class CourseEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
   private def createCourseEndpoint(
       courseService: CourseService[F]
   ): AuthEndpoint[F, Auth] = {
-    case req @ POST -> Root / "course" asAuthed _ =>
+    case req @ POST -> Root asAuthed _ =>
       val action =
         for {
           course <- req.request.as[Course]
@@ -47,7 +47,7 @@ class CourseEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
   private def updateCourseEndpoint(
       courseService: CourseService[F]
   ): AuthEndpoint[F, Auth] = {
-    case req @ POST -> Root / "course" / LongVar(id) asAuthed _ =>
+    case req @ POST -> Root / LongVar(id) asAuthed _ =>
       courseService.getCourse(id).value.flatMap {
         case Right(_) =>
           val action =
@@ -68,10 +68,30 @@ class CourseEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
   private def deleteCourseEndpoint(
       courseService: CourseService[F]
   ): AuthEndpoint[F, Auth] = {
-    case DELETE -> Root / "course" / LongVar(id) asAuthed _ =>
+    case DELETE -> Root / LongVar(id) asAuthed _ =>
       for {
         _ <- courseService.deleteCourse(id)
         resp <- Ok()
+      } yield resp
+  }
+
+  private def searchCourseEndpoint(
+      courseService: CourseService[F]
+  ): AuthEndpoint[F, Auth] = {
+    case GET -> Root / LongVar(id) asAuthed _ =>
+      courseService.getCourse(id).value.flatMap {
+        case Right(found)              => Ok(found.asJson)
+        case Left(CourseNotFoundError) => NotFound("The course not found")
+      }
+  }
+
+  def listCoursesEndpoint(
+      courseService: CourseService[F]
+  ): AuthEndpoint[F, Auth] = {
+    case GET -> Root / "category" / LongVar(id) asAuthed _ =>
+      for {
+        retrieved <- courseService.getCoursesByCategoryId(id)
+        resp <- Ok(retrieved.asJson)
       } yield resp
   }
 
@@ -79,14 +99,19 @@ class CourseEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
       courseService: CourseService[F],
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] = {
-    val teacherAuthEndpoints: AuthService[F, Auth] = {
+    val teacherAuthEndpoints: AuthService[F, Auth] =
       Auth.teacherOnly {
         createCourseEndpoint(courseService)
           .orElse(updateCourseEndpoint(courseService))
           .orElse(deleteCourseEndpoint(courseService))
       }
-    }
-    auth.liftService(teacherAuthEndpoints)
+
+    val authEndpoints: AuthService[F, Auth] =
+      Auth.allRoles {
+        listCoursesEndpoint(courseService)
+          .orElse(searchCourseEndpoint(courseService))
+      }
+    auth.liftService(teacherAuthEndpoints) <+> auth.liftService(authEndpoints)
   }
 }
 
