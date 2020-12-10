@@ -6,20 +6,14 @@ import io.circe.generic.auto._
 import io.circe.syntax._
 import io.gitlab.scp2020.skyeng.controllers.RoomController
 import io.gitlab.scp2020.skyeng.domain.authentication.Auth
+import io.gitlab.scp2020.skyeng.domain.users.User
 import io.gitlab.scp2020.skyeng.domain.users.teacher.{
   TeacherProfile,
   TeacherProfileService
 }
-import io.gitlab.scp2020.skyeng.domain.users.{Role, User, UserService}
-import io.gitlab.scp2020.skyeng.domain.{
-  RoomNotFoundError,
-  TeacherAlreadyExistsError,
-  TeacherNotFoundError,
-  UserNotFoundError
-}
+import io.gitlab.scp2020.skyeng.domain.{RoomNotFoundError, TeacherNotFoundError}
 import io.gitlab.scp2020.skyeng.infrastructure.endpoint.{
-  AuthEndpoint,
-  AuthService
+  AuthEndpoint
 }
 import io.gitlab.scp2020.skyeng.infrastructure.repository.doobie.Pagination.{
   OptionalOffsetMatcher,
@@ -38,62 +32,34 @@ class TeacherProfileEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
 
   def endpoints(
       teacherProfileService: TeacherProfileService[F],
-      userService: UserService[F],
       roomController: RoomController[F],
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] = {
-    val adminEndpoints: AuthService[F, Auth] =
-      Auth.adminOnly {
-        setUserAsTeacherEndpoint(teacherProfileService, userService)
-          .orElse(listTeacherProfilesEndpoint(teacherProfileService))
-          .orElse(searchTeacherProfileEndpoint(teacherProfileService))
-          .orElse(deleteTeacherProfileEndpoint(teacherProfileService))
-
+    val adminEndpoints =
+      Auth.allRoles{
+        listTeacherProfilesEndpoint(teacherProfileService)
+                  .orElse(searchTeacherProfileEndpoint(teacherProfileService))
+                  .orElse(deleteTeacherProfileEndpoint(teacherProfileService))
+                  .orElse(updateTeacherProfileEndpoint(teacherProfileService))
+                    .orElse(getRoomOfTeacherEndpoint(roomController))
+                    .orElse(setRoomOpenEndpoint(roomController))
+                    .orElse(setRoomClosedEndpoint(roomController))
       }
-    val teacherEndpoints =
-      Auth.teacherOnly {
-        updateTeacherProfileEndpoint(teacherProfileService)
-          .orElse(getRoomOfTeacherEndpoint(roomController))
-          .orElse(setRoomOpenEndpoint(roomController))
-          .orElse(setRoomClosedEndpoint(roomController))
-      }
-    auth.liftService(teacherEndpoints) <+> auth.liftService(adminEndpoints)
-  }
+//      Auth.adminOnly {
+//        listTeacherProfilesEndpoint(teacherProfileService)
+//          .orElse(searchTeacherProfileEndpoint(teacherProfileService))
+//          .orElse(deleteTeacherProfileEndpoint(teacherProfileService))
+//
+//      }
+//      val teacherOnly =
+//        Auth.teacherOnly {
+//          updateTeacherProfileEndpoint(teacherProfileService)
+//            .orElse(getRoomOfTeacherEndpoint(roomController))
+//            .orElse(setRoomOpenEndpoint(roomController))
+//            .orElse(setRoomClosedEndpoint(roomController))
+//        }
 
-  // TODO SET all error messages to the same value as they correspond to error class
-  private def setUserAsTeacherEndpoint(
-      teacherProfileService: TeacherProfileService[F],
-      userService: UserService[F]
-  ): AuthEndpoint[F, Auth] = {
-    case req @ POST -> Root / "assign" / LongVar(id) asAuthed _ =>
-      userService.getUser(id).value.flatMap {
-        case Right(foundUser) =>
-          val action =
-            for {
-              teacher <-
-                req.request
-                  .as[TeacherProfile]
-                  .map(_.copy(userId = id))
-              saved <- teacherProfileService.createTeacher(teacher).value
-            } yield saved
-
-          action.flatMap {
-            case Right(saved) =>
-              Ok(saved.asJson)
-            case Left(TeacherAlreadyExistsError(existing)) =>
-              Conflict(
-                s"The teacher profile with userId: ${existing.userId} already exists"
-              )
-          }
-          val updatedUser =
-            userService.update(foundUser.copy(role = Role("teacher"))).value
-
-          updatedUser.flatMap {
-            case Right(saved)            => Ok(saved.asJson)
-            case Left(UserNotFoundError) => NotFound("User not found")
-          }
-        case Left(UserNotFoundError) => NotFound("User not found")
-      }
+    auth.liftService(adminEndpoints)
 
   }
 
@@ -110,7 +76,7 @@ class TeacherProfileEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
   private def updateTeacherProfileEndpoint(
       teacherProfileService: TeacherProfileService[F]
   ): AuthEndpoint[F, Auth] = {
-    case req @ POST -> Root / "update" / LongVar(id) asAuthed _ =>
+    case req @ PUT -> Root / "update" / LongVar(id) asAuthed _ =>
       teacherProfileService.getTeacher(id).value.flatMap {
         case Right(foundTeacher) =>
           val action = {
@@ -120,7 +86,7 @@ class TeacherProfileEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
                 userId = foundTeacher.userId,
                 bio = teacher.bio,
                 greeting = teacher.greeting,
-                qualification = foundTeacher.qualification
+                qualification = teacher.qualification
               )
               result <- teacherProfileService.updateTeacher(updated).value
             } yield result
@@ -158,12 +124,11 @@ class TeacherProfileEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
       for {
         retrieved <- teacherProfileService.list(
           pageSize.getOrElse(10),
-          offset.getOrElse(10)
+          offset.getOrElse(0)
         )
         resp <- Ok(retrieved.asJson)
       } yield resp
   }
-
   private def getRoomOfTeacherEndpoint(
       roomController: RoomController[F]
   ): AuthEndpoint[F, Auth] = {
@@ -177,7 +142,7 @@ class TeacherProfileEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
   private def setRoomOpenEndpoint(
       roomController: RoomController[F]
   ): AuthEndpoint[F, Auth] = {
-    case GET -> Root / "room/open" / LongVar(roomId) asAuthed _ =>
+    case POST -> Root / "room/open" / LongVar(roomId) asAuthed _ =>
       val action = roomController.setRoomActivity(roomId, isOpen = true)
 
       action.flatMap {
@@ -186,11 +151,10 @@ class TeacherProfileEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
           NotFound(s"Room with given id: $roomId not found.")
       }
   }
-
   private def setRoomClosedEndpoint(
       roomController: RoomController[F]
   ): AuthEndpoint[F, Auth] = {
-    case GET -> Root / "room/open" / LongVar(roomId) asAuthed _ =>
+    case POST -> Root / "room/close" / LongVar(roomId) asAuthed _ =>
       val action = roomController.setRoomActivity(roomId, isOpen = false)
 
       action.flatMap {
@@ -204,10 +168,9 @@ class TeacherProfileEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
 object TeacherProfileEndpoints {
   def endpoints[F[_]: Sync, Auth: JWTMacAlgo](
       teacherProfileService: TeacherProfileService[F],
-      userService: UserService[F],
       roomController: RoomController[F],
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] =
     new TeacherProfileEndpoints[F, Auth]
-      .endpoints(teacherProfileService, userService, roomController, auth)
+      .endpoints(teacherProfileService, roomController, auth)
 }

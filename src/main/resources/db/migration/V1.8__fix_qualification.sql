@@ -1,0 +1,1 @@
+alter table "teacher_profile" alter column qualification type varchar(64)

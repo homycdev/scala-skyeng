@@ -153,19 +153,21 @@ object SkyengServer extends IOApp {
       roomController = RoomController[F](roomService)
 
       httpApp = Router(
-        "/users" -> UserEndpoints
+        "/user" -> UserEndpoints
           .endpoints[F, BCrypt, HMACSHA256](
             routeAuth,
-            userController
+            userController,
+            roomController,
+            teacherService,
+            studentService
           ),
-        "/teachers" -> TeacherProfileEndpoints
+        "/teacher" -> TeacherProfileEndpoints
           .endpoints[F, HMACSHA256](
             teacherService,
-            userService,
             roomController,
             routeAuth
           ),
-        "/students" -> StudentProfileEndpoints
+        "/student" -> StudentProfileEndpoints
           .endpoints[F, HMACSHA256](studentService, roomController, routeAuth),
         "/payment" -> PaymentEndpoints
           .endpoints[F, HMACSHA256](
@@ -173,7 +175,7 @@ object SkyengServer extends IOApp {
             studentService,
             routeAuth
           ),
-        "/results" -> ResultEndpoints
+        "/result" -> ResultEndpoints
           .endpoints[F, HMACSHA256](exerciseResultService, routeAuth),
         "/schedule" -> ScheduleEndpoints
           .endpoints[F, HMACSHA256](scheduleService, routeAuth),

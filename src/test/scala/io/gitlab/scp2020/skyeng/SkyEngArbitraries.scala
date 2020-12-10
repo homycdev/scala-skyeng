@@ -1,7 +1,27 @@
 package io.gitlab.scp2020.skyeng
 
 import cats.effect.IO
-import io.gitlab.scp2020.skyeng.domain.authentication.SignupRequest
+import io.circe.Json
+import io.gitlab.scp2020.skyeng.domain.authentication.{
+  ReplenishRequest,
+  SignupRequest
+}
+import io.gitlab.scp2020.skyeng.domain.courses.classes.{
+  Homework,
+  Lesson,
+  LevelType
+}
+import io.gitlab.scp2020.skyeng.domain.courses.exercises.{
+  Exercise,
+  ExerciseType
+}
+import io.gitlab.scp2020.skyeng.domain.courses.tasks.{Task, TaskType}
+import io.gitlab.scp2020.skyeng.domain.courses.{
+  Course,
+  CourseCategory,
+  Enrollment
+}
+import io.gitlab.scp2020.skyeng.domain.users.student.StudentProfile
 import io.gitlab.scp2020.skyeng.domain.users.teacher.{
   QualificationType,
   TeacherProfile
@@ -32,8 +52,20 @@ trait SkyEngArbitraries {
   implicit val role: Arbitrary[Role] =
     Arbitrary[Role](Gen.oneOf(Role.values.toIndexedSeq))
 
+  implicit val level: Arbitrary[LevelType] =
+    Arbitrary[LevelType](Gen.oneOf(LevelType.values))
+
   implicit val qualificationType: Arbitrary[QualificationType] =
     Arbitrary[QualificationType](Gen.oneOf(QualificationType.values))
+
+  implicit val taskType: Arbitrary[TaskType] =
+    Arbitrary[TaskType](Gen.oneOf(TaskType.values))
+
+  implicit val exerciseType: Arbitrary[ExerciseType] =
+    Arbitrary[ExerciseType](Gen.oneOf(ExerciseType.values))
+
+  implicit val jsonArbitrary: Arbitrary[Json] =
+    Arbitrary[Json](Gen.oneOf(Seq(Json.True, Json.False)))
 
   implicit val user: Arbitrary[User] = Arbitrary[User] {
     for {
@@ -46,7 +78,7 @@ trait SkyEngArbitraries {
       password <- arbitrary[String]
       phone <- optionString
       role <- arbitrary[Role]
-      id <- Gen.option(Gen.posNum[Long])
+      id <- Gen.some(Gen.posNum[Long])
 
     } yield User(
       userName,
@@ -128,6 +160,14 @@ trait SkyEngArbitraries {
     } yield TeacherProfile(id, bio, greeting, qualification)
   }
 
+  implicit val student: Arbitrary[StudentProfile] = Arbitrary[StudentProfile] {
+    for {
+      id <- Gen.posNum[Long]
+      teacherId <- Gen.some(Gen.posNum[Long])
+      balance <- Gen.posNum[Int]
+    } yield StudentProfile(id, teacherId, balance)
+  }
+
   case class AdminUser(value: User)
 
   case class StudentUser(value: User)
@@ -148,14 +188,75 @@ trait SkyEngArbitraries {
     user.arbitrary.map(user => user.copy(id = Some(3L), role = Role.Student))
   }
 
-  implicit val teacherUser: Arbitrary[TeacherProfile] = Arbitrary {
-    teacher.arbitrary.map(teacher => teacher.copy(userId = 4L))
+  implicit val courseCategory: Arbitrary[CourseCategory] =
+    Arbitrary[CourseCategory] {
+      for {
+        id <- Gen.some(Gen.posNum[Long])
+        title <- arbitrary[String]
+      } yield CourseCategory(id = id, title = title)
+    }
+
+  implicit val course: Arbitrary[Course] = Arbitrary[Course] {
+    for {
+      id <- Gen.some(Gen.posNum[Long])
+      title <- arbitrary[String]
+      categoryId <- Gen.some(Gen.posNum[Long])
+    } yield Course(id = id, title = title, categoryId = categoryId)
   }
 
-  implicit val userTeacher: Arbitrary[User] = Arbitrary {
-    user.arbitrary.map(user => user.copy(id = Some(4L), role = Role.Teacher))
+  implicit val enrollment: Arbitrary[Enrollment] = Arbitrary[Enrollment] {
+    for {
+      id <- Gen.some(Gen.posNum[Long])
+      studentId <- Gen.posNum[Long]
+      courseId <- Gen.posNum[Long]
+    } yield Enrollment(id, studentId, courseId)
   }
 
+  implicit val lesson: Arbitrary[Lesson] = Arbitrary[Lesson] {
+    for {
+      id <- Gen.some(Gen.posNum[Long])
+      title <- arbitrary[String]
+      courseId <- Gen.some(Gen.posNum[Long])
+      difficulty <- arbitrary[LevelType]
+      listPosition <- Gen.posNum[Int]
+    } yield Lesson(id, title, courseId, difficulty, listPosition)
+  }
+
+  implicit val homework: Arbitrary[Homework] = Arbitrary[Homework] {
+    for {
+      id <- Gen.some(Gen.posNum[Long])
+      title <- arbitrary[String]
+      courseId <- Gen.some(Gen.posNum[Long])
+      lessonId <- Gen.some(Gen.posNum[Long])
+      difficulty <- arbitrary[LevelType]
+      listPosition <- Gen.posNum[Int]
+    } yield Homework(id, title, courseId, lessonId, difficulty, listPosition)
+  }
+
+  implicit val task: Arbitrary[Task] = Arbitrary[Task] {
+    for {
+      id <- Gen.some(Gen.posNum[Long])
+      classId <- Gen.some(Gen.posNum[Long])
+      taskType <- arbitrary[TaskType]
+      listPosition <- Gen.posNum[Int]
+    } yield Task(id, classId, taskType, listPosition)
+  }
+
+  implicit val exercise: Arbitrary[Exercise] = Arbitrary[Exercise] {
+    for {
+      id <- Gen.some(Gen.posNum[Long])
+      taskId <- Gen.some(Gen.posNum[Long])
+      exerciseType <- arbitrary[ExerciseType]
+      content <- arbitrary[Json]
+    } yield Exercise(id, taskId, exerciseType, content)
+  }
+
+  implicit val replenish: Arbitrary[ReplenishRequest] =
+    Arbitrary[ReplenishRequest] {
+      for {
+        amount <- Gen.posNum[Int]
+      } yield ReplenishRequest(amount)
+    }
 }
 
 object SkyEngArbitraries extends SkyEngArbitraries

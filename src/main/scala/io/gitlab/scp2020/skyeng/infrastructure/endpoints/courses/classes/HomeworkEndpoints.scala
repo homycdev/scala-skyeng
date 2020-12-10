@@ -29,7 +29,7 @@ class HomeworkEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
   private def createHomeworkEndpoint(
       homeworkService: HomeworkService[F]
   ): AuthEndpoint[F, Auth] = {
-    case req @ POST -> Root / "create" asAuthed _ =>
+    case req @ POST -> Root asAuthed _ =>
       val action =
         for {
           homework <- req.request.as[Homework]
@@ -84,17 +84,26 @@ class HomeworkEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
       homeworkService: HomeworkService[F],
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] = {
-    val teacherAuthEndpoints: AuthService[F, Auth] =
-      Auth.teacherOnly {
-        createHomeworkEndpoint(homeworkService)
-          .orElse(deleteHomeworkEndpoint(homeworkService))
-      }
+//    val teacherAuthEndpoints: AuthService[F, Auth] =
+//      Auth.teacherOnly {
+//        createHomeworkEndpoint(homeworkService)
+//          .orElse(deleteHomeworkEndpoint(homeworkService))
+//      }
+//    val authEndpoints: AuthService[F, Auth] =
+//      Auth.allRoles {
+//        listHomeworksEndpoint(homeworkService)
+//          .orElse(searchHomeworkEndpoint(homeworkService))
+//      }
+//    auth.liftService(teacherAuthEndpoints) <+> auth.liftService(authEndpoints)
+
     val authEndpoints: AuthService[F, Auth] =
       Auth.allRoles {
         listHomeworksEndpoint(homeworkService)
           .orElse(searchHomeworkEndpoint(homeworkService))
+          .orElse(deleteHomeworkEndpoint(homeworkService))
+          .orElse(createHomeworkEndpoint(homeworkService))
       }
-    auth.liftService(teacherAuthEndpoints) <+> auth.liftService(authEndpoints)
+    auth.liftService(authEndpoints)
   }
 }
 

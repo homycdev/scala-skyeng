@@ -16,13 +16,13 @@ import tsec.authentication.IdentityStore
 private object CourseCategorySQL {
   def insert(category: CourseCategory): Update0 =
     sql"""
-    INSERT INTO course (title)
+    INSERT INTO course_category (title)
     VALUES (${category.title})
   """.update
 
   def update(category: CourseCategory, id: Long): Update0 =
     sql"""
-    UPDATE course
+    UPDATE course_category
     SET title = ${category.title}
     WHERE id = $id
   """.update
@@ -30,19 +30,19 @@ private object CourseCategorySQL {
   def select(categoryId: Long): Query0[CourseCategory] =
     sql"""
     SELECT id, title
-    FROM course
+    FROM course_category
     WHERE id = $categoryId
   """.query[CourseCategory]
 
   def delete(categoryId: Long): Update0 =
     sql"""
-    DELETE FROM course WHERE id = $categoryId
+    DELETE FROM course_category WHERE id = $categoryId
   """.update
 
   def selectAll: Query0[CourseCategory] =
     sql"""
     SELECT id, title
-    FROM course
+    FROM course_category
   """.query[CourseCategory]
 }
 

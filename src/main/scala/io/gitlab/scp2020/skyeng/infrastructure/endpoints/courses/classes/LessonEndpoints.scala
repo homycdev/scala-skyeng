@@ -4,7 +4,10 @@ import cats.effect.Sync
 import cats.syntax.all._
 import io.circe.generic.auto._
 import io.circe.syntax._
-import io.gitlab.scp2020.skyeng.domain.authentication.Auth
+import io.gitlab.scp2020.skyeng.domain.authentication.{
+  Auth,
+  LessonUpdateRequest
+}
 import io.gitlab.scp2020.skyeng.domain.courses.classes.{Lesson, LessonService}
 import io.gitlab.scp2020.skyeng.domain.users.User
 import io.gitlab.scp2020.skyeng.domain.{
@@ -25,11 +28,13 @@ import tsec.jwt.algorithms.JWTMacAlgo
 class LessonEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
 
   implicit val lessonDec: EntityDecoder[F, Lesson] = jsonOf
+  implicit val lessonUpdateReqDec: EntityDecoder[F, LessonUpdateRequest] =
+    jsonOf
 
   private def createLessonEndpoint(
       lessonService: LessonService[F]
   ): AuthEndpoint[F, Auth] = {
-    case req @ POST -> Root / "create" asAuthed _ =>
+    case req @ POST -> Root asAuthed _ =>
       val action =
         for {
           lesson <- req.request.as[Lesson]
@@ -46,20 +51,14 @@ class LessonEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
   private def updateLessonEndpoint(
       lessonService: LessonService[F]
   ): AuthEndpoint[F, Auth] = {
-    case req @ POST -> Root / "update" / LongVar(id) asAuthed _ =>
+    case req @ PUT -> Root / LongVar(id) asAuthed _ =>
       lessonService.getLesson(id).value.flatMap {
-        case Right(found) =>
+        case Right(lesson) =>
           val action =
             for {
-              lesson <- req.request.as[Lesson]
-              toUpdate = lesson.copy(
-                id = found.id,
-                listPosition = found.listPosition,
-                title = lesson.title,
-                courseId = lesson.courseId,
-                difficulty = lesson.difficulty
-              )
-              res <- lessonService.updateLesson(lesson).value
+              request <- req.request.as[LessonUpdateRequest]
+              updatable = request.asLesson(lesson)
+              res <- lessonService.updateLesson(updatable).value
             } yield res
 
           action.flatMap {
@@ -111,18 +110,28 @@ class LessonEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
       lessonService: LessonService[F],
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] = {
-    val teacherAuthEndpoints: AuthService[F, Auth] =
-      Auth.teacherOnly {
+//    val teacherAuthEndpoints: AuthService[F, Auth] =
+//      Auth.teacherOnly {
+//        createLessonEndpoint(lessonService)
+//          .orElse(updateLessonEndpoint(lessonService))
+//          .orElse(deleteLessonEndpoint(lessonService))
+//      }
+//    val authEndpoints: AuthService[F, Auth] =
+//      Auth.allRoles {
+//        listLessonsEndpoint(lessonService)
+//          .orElse(searchLessonEndpoint(lessonService))
+//      }
+//    auth.liftService(teacherAuthEndpoints) <+> auth.liftService(authEndpoints)
+
+    val authEndpoints: AuthService[F, Auth] =
+      Auth.allRoles {
         createLessonEndpoint(lessonService)
           .orElse(updateLessonEndpoint(lessonService))
           .orElse(deleteLessonEndpoint(lessonService))
-      }
-    val authEndpoints: AuthService[F, Auth] =
-      Auth.allRoles {
-        listLessonsEndpoint(lessonService)
+          .orElse(listLessonsEndpoint(lessonService))
           .orElse(searchLessonEndpoint(lessonService))
       }
-    auth.liftService(teacherAuthEndpoints) <+> auth.liftService(authEndpoints)
+    auth.liftService(authEndpoints)
   }
 }
 

@@ -31,11 +31,11 @@ trait LoginTest extends Http4sClientDsl[IO] with Http4sDsl[IO] {
       userEndpoint: HttpApp[IO]
   ): IO[(User, Option[Authorization])] =
     for {
-      signUpRq <- POST(userSignUp, uri"/users")
+      signUpRq <- POST(userSignUp, uri"/user")
       signUpResp <- userEndpoint.run(signUpRq)
       user <- signUpResp.as[User]
       loginBody = LoginRequest(userSignUp.userName, userSignUp.password)
-      loginRq <- POST(loginBody, uri"/users/login")
+      loginRq <- POST(loginBody, uri"/user/login")
       loginResp <- userEndpoint.run(loginRq)
     } yield user -> loginResp.headers.get(Authorization)
 
@@ -45,7 +45,13 @@ trait LoginTest extends Http4sClientDsl[IO] with Http4sDsl[IO] {
   ): IO[(User, Option[Authorization])] =
     signUpAndLogIn(userSignUp.copy(role = Role.Admin), userEndpoint)
 
-  def signUpAndLogInAsCustomer(
+  def signUpAndLogInAsTeacher(
+      userSignUp: SignupRequest,
+      userEndpoint: Kleisli[IO, Request[IO], Response[IO]]
+  ): IO[(User, Option[Authorization])] =
+    signUpAndLogIn(userSignUp.copy(role = Role.Teacher), userEndpoint)
+
+  def signUpAndLogInAsStudent(
       userSignUp: SignupRequest,
       userEndpoint: Kleisli[IO, Request[IO], Response[IO]]
   ): IO[(User, Option[Authorization])] =

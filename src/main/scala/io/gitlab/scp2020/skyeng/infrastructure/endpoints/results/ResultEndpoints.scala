@@ -113,14 +113,22 @@ class ResultEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
       exerciseResultService: ExerciseResultService[F],
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] = {
-    val studentAuthEndpoints: AuthService[F, Auth] = {
-      Auth.studentOnly {
+//    val studentAuthEndpoints: AuthService[F, Auth] = {
+//      Auth.studentOnly {
+//        createResultsEndpoint(exerciseResultService)
+//          .orElse(updateResultsEndpoint(exerciseResultService))
+//          .orElse(searchExerciseResultsEndpoint(exerciseResultService))
+//      }
+//    }
+//    auth.liftService(studentAuthEndpoints)
+    val authEndpoints: AuthService[F, Auth] = {
+      Auth.allRoles {
         createResultsEndpoint(exerciseResultService)
           .orElse(updateResultsEndpoint(exerciseResultService))
           .orElse(searchExerciseResultsEndpoint(exerciseResultService))
       }
     }
-    auth.liftService(studentAuthEndpoints)
+    auth.liftService(authEndpoints)
   }
 }
 

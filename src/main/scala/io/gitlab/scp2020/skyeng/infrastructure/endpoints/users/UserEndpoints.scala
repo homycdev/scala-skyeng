@@ -2,11 +2,18 @@ package io.gitlab.scp2020.skyeng.infrastructure.endpoints.users
 
 import cats.effect.Sync
 import cats.syntax.all._
-import io.circe.generic.auto._
 import io.circe.syntax._
-import io.gitlab.scp2020.skyeng.controllers.UserController
+import io.gitlab.scp2020.skyeng.controllers.{RoomController, UserController}
 import io.gitlab.scp2020.skyeng.domain.authentication.Auth
-import io.gitlab.scp2020.skyeng.domain.users.User
+import io.gitlab.scp2020.skyeng.domain.users.student.{
+  StudentProfile,
+  StudentProfileService
+}
+import io.gitlab.scp2020.skyeng.domain.users.teacher.{
+  TeacherProfile,
+  TeacherProfileService
+}
+import io.gitlab.scp2020.skyeng.domain.users.{Role, User}
 import io.gitlab.scp2020.skyeng.domain.{
   UserAlreadyExistsError,
   UserAuthenticationFailedError,
@@ -27,7 +34,10 @@ import tsec.authentication._
 import tsec.jwt.algorithms.JWTMacAlgo
 
 class UserEndpoints[F[_]: Sync, A, Auth: JWTMacAlgo](
-    userController: UserController[F, A, Auth]
+    userController: UserController[F, A, Auth],
+    roomController: RoomController[F],
+    teacherProfileService: TeacherProfileService[F],
+    studentProfileService: StudentProfileService[F]
 ) extends Http4sDsl[F] {
 
   def endpoints(
@@ -65,9 +75,36 @@ class UserEndpoints[F[_]: Sync, A, Auth: JWTMacAlgo](
   private def signupEndpoint: HttpRoutes[F] =
     HttpRoutes.of[F] {
       case req @ POST -> Root =>
-        val response = userController.signUp(req)
+        val response: F[Either[UserAlreadyExistsError, User]] =
+          userController.signUp(req)
         response.flatMap {
-          case Right(saved) => Ok(saved.asJson)
+          case Right(user) =>
+            val action = user.role match {
+              case Role.Teacher =>
+                val profile = TeacherProfile(userId = user.id.get)
+                for {
+                  created <- teacherProfileService.createTeacher(profile).value
+                } yield created
+              case Role.Student =>
+                val profile = StudentProfile(userId = user.id.get)
+                for {
+                  _ <- roomController.createRoom(user.id.get)
+                  created <- studentProfileService.createStudent(profile).value
+                } yield created
+              case _ =>
+                for {
+                  created <- userController.searchByName(user.userName).value
+                } yield created
+            }
+
+            action.flatMap {
+              case Right(_) =>
+                Ok(user.asJson)
+              case Left(_) =>
+                Conflict(
+                  s"The user profile with user id ${user.id} already exists"
+                )
+            }
           case Left(UserAlreadyExistsError(existing)) =>
             Conflict(
               s"The user with user name ${existing.userName} already exists"
@@ -120,8 +157,15 @@ class UserEndpoints[F[_]: Sync, A, Auth: JWTMacAlgo](
 object UserEndpoints {
   def endpoints[F[_]: Sync, A, Auth: JWTMacAlgo](
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]],
-      userController: UserController[F, A, Auth]
+      userController: UserController[F, A, Auth],
+      roomController: RoomController[F],
+      teacherProfileService: TeacherProfileService[F],
+      studentProfileService: StudentProfileService[F]
   ): HttpRoutes[F] =
-    new UserEndpoints[F, A, Auth](userController)
-      .endpoints(auth)
+    new UserEndpoints[F, A, Auth](
+      userController,
+      roomController,
+      teacherProfileService,
+      studentProfileService
+    ).endpoints(auth)
 }

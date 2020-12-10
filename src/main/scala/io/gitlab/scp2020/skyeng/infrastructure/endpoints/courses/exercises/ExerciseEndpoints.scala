@@ -87,17 +87,26 @@ class ExerciseEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
       exerciseService: ExerciseService[F],
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] = {
-    val teacherAuthEndpoints: AuthService[F, Auth] =
-      Auth.teacherOnly {
-        createExerciseEndpoint(exerciseService)
-          .orElse(deleteExerciseEndpoint(exerciseService))
-      }
+//    val teacherAuthEndpoints: AuthService[F, Auth] =
+//      Auth.teacherOnly {
+//        createExerciseEndpoint(exerciseService)
+//          .orElse(deleteExerciseEndpoint(exerciseService))
+//      }
+//    val authEndpoints: AuthService[F, Auth] =
+//      Auth.allRoles {
+//        listExercisesEndpoint(exerciseService)
+//          .orElse(searchExerciseEndpoint(exerciseService))
+//      }
+//    auth.liftService(teacherAuthEndpoints) <+> auth.liftService(authEndpoints)
+
     val authEndpoints: AuthService[F, Auth] =
       Auth.allRoles {
         listExercisesEndpoint(exerciseService)
           .orElse(searchExerciseEndpoint(exerciseService))
+          .orElse(deleteExerciseEndpoint(exerciseService))
+          .orElse(createExerciseEndpoint(exerciseService))
       }
-    auth.liftService(teacherAuthEndpoints) <+> auth.liftService(authEndpoints)
+    auth.liftService(authEndpoints)
   }
 }
 
