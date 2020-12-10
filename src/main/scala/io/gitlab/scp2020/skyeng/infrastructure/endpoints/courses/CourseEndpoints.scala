@@ -4,7 +4,11 @@ import cats.effect.Sync
 import cats.syntax.all._
 import io.circe.generic.auto._
 import io.circe.syntax._
-import io.gitlab.scp2020.skyeng.domain.authentication.Auth
+import io.gitlab.scp2020.skyeng.domain.authentication.{
+  Auth,
+  CourseCreateRequest,
+  CourseUpdateRequest
+}
 import io.gitlab.scp2020.skyeng.domain.courses.{CourseService, _}
 import io.gitlab.scp2020.skyeng.domain.users.User
 import io.gitlab.scp2020.skyeng.domain.{
@@ -24,7 +28,8 @@ import tsec.jwt.algorithms.JWTMacAlgo
 
 class CourseEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
 
-  implicit val courseDec: EntityDecoder[F, Course] = jsonOf
+  implicit val courseUpdateDec: EntityDecoder[F, CourseUpdateRequest] = jsonOf
+  implicit val courseCreateDec: EntityDecoder[F, CourseCreateRequest] = jsonOf
 
   private def createCourseEndpoint(
       courseService: CourseService[F]
@@ -32,9 +37,10 @@ class CourseEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
     case req @ POST -> Root asAuthed _ =>
       val action =
         for {
-          course <- req.request.as[Course]
-          createdCourse <- courseService.createCourse(course).value
-        } yield createdCourse
+          data <- req.request.as[CourseCreateRequest]
+          course = Course(title = data.title, categoryId = data.categoryId)
+          created <- courseService.createCourse(course).value
+        } yield created
 
       action.flatMap {
         case Right(saved) => Ok(saved.asJson)
@@ -47,13 +53,14 @@ class CourseEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
   private def updateCourseEndpoint(
       courseService: CourseService[F]
   ): AuthEndpoint[F, Auth] = {
-    case req @ POST -> Root / LongVar(id) asAuthed _ =>
+    case req @ PUT -> Root / LongVar(id) asAuthed _ =>
       courseService.getCourse(id).value.flatMap {
-        case Right(_) =>
+        case Right(course) =>
           val action =
             for {
-              course <- req.request.as[Course]
-              res <- courseService.updateCourse(course).value
+              data <- req.request.as[CourseUpdateRequest]
+              updatable = data.asCourse(course)
+              res <- courseService.updateCourse(updatable).value
             } yield res
 
           action.flatMap {
@@ -99,19 +106,30 @@ class CourseEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
       courseService: CourseService[F],
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] = {
-    val teacherAuthEndpoints: AuthService[F, Auth] =
-      Auth.teacherOnly {
-        createCourseEndpoint(courseService)
-          .orElse(updateCourseEndpoint(courseService))
-          .orElse(deleteCourseEndpoint(courseService))
-      }
+//    val teacherAuthEndpoints: AuthService[F, Auth] =
+//      Auth.teacherOnly {
+//        createCourseEndpoint(courseService)
+//          .orElse(updateCourseEndpoint(courseService))
+//          .orElse(deleteCourseEndpoint(courseService))
+//      }
+//
+//    val authEndpoints: AuthService[F, Auth] =
+//      Auth.allRoles {
+//        listCoursesEndpoint(courseService)
+//          .orElse(searchCourseEndpoint(courseService))
+//      }
+//    auth.liftService(teacherAuthEndpoints) <+> auth.liftService(authEndpoints)
 
     val authEndpoints: AuthService[F, Auth] =
       Auth.allRoles {
-        listCoursesEndpoint(courseService)
+        createCourseEndpoint(courseService)
+          .orElse(updateCourseEndpoint(courseService))
+          .orElse(deleteCourseEndpoint(courseService))
+          .orElse(listCoursesEndpoint(courseService))
           .orElse(searchCourseEndpoint(courseService))
       }
-    auth.liftService(teacherAuthEndpoints) <+> auth.liftService(authEndpoints)
+
+    auth.liftService(authEndpoints)
   }
 }
 

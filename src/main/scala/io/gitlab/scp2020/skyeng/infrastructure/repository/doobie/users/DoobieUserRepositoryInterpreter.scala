@@ -25,7 +25,7 @@ private object UserSQL {
   def update(user: User, id: Long): Update0 =
     sql"""
     UPDATE "user"
-    SET first_name = ${user.firstName}, last_name = ${user.lastName}, 
+    SET user_name = ${user.userName},first_name = ${user.firstName}, last_name = ${user.lastName},
     birth_date = ${user.birthDate}, gender = ${user.gender}, 
     email = ${user.email}, hash = ${user.hash}, phone_number = ${user.phone}, role = ${user.role}
     WHERE id = $id

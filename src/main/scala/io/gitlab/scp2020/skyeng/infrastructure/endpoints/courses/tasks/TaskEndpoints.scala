@@ -84,17 +84,26 @@ class TaskEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
       taskService: TaskService[F],
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] = {
-    val teacherAuthEndpoints: AuthService[F, Auth] =
-      Auth.teacherOnly {
-        createTaskEndpoint(taskService)
-          .orElse(deleteTaskEndpoint(taskService))
-      }
+//    val teacherAuthEndpoints: AuthService[F, Auth] =
+//      Auth.teacherOnly {
+//        createTaskEndpoint(taskService)
+//          .orElse(deleteTaskEndpoint(taskService))
+//      }
+//    val authEndpoints: AuthService[F, Auth] =
+//      Auth.allRoles {
+//        listTasksEndpoint(taskService)
+//          .orElse(searchTaskEndpoint(taskService))
+//      }
+//    auth.liftService(teacherAuthEndpoints) <+> auth.liftService(authEndpoints)
+
     val authEndpoints: AuthService[F, Auth] =
       Auth.allRoles {
         listTasksEndpoint(taskService)
           .orElse(searchTaskEndpoint(taskService))
+          .orElse(deleteTaskEndpoint(taskService))
+          .orElse(createTaskEndpoint(taskService))
       }
-    auth.liftService(teacherAuthEndpoints) <+> auth.liftService(authEndpoints)
+    auth.liftService(authEndpoints)
   }
 }
 

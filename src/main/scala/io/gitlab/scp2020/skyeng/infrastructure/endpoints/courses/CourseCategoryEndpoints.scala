@@ -4,7 +4,10 @@ import cats.effect.Sync
 import cats.syntax.all._
 import io.circe.generic.auto._
 import io.circe.syntax._
-import io.gitlab.scp2020.skyeng.domain.authentication.Auth
+import io.gitlab.scp2020.skyeng.domain.authentication.{
+  Auth,
+  CourseCategoryRequest
+}
 import io.gitlab.scp2020.skyeng.domain.courses.{CourseCategoryService, _}
 import io.gitlab.scp2020.skyeng.domain.users.User
 import io.gitlab.scp2020.skyeng.domain.{
@@ -26,18 +29,19 @@ import org.http4s.{EntityDecoder, HttpRoutes}
 import tsec.authentication.{AugmentedJWT, SecuredRequestHandler, asAuthed}
 import tsec.jwt.algorithms.JWTMacAlgo
 
-class CourseCategoryEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
-    extends Http4sDsl[F] {
+class CourseCategoryEndpoints[F[_]: Sync, Auth: JWTMacAlgo](
+    courseCategoryService: CourseCategoryService[F]
+) extends Http4sDsl[F] {
 
-  implicit val courseCategoryDec: EntityDecoder[F, CourseCategory] = jsonOf
+  implicit val courseCategoryDec: EntityDecoder[F, CourseCategoryRequest] =
+    jsonOf
 
-  private def createCourseCategoryEndpoint(
-      courseCategoryService: CourseCategoryService[F]
-  ): AuthEndpoint[F, Auth] = {
+  private def createCourseCategoryEndpoint(): AuthEndpoint[F, Auth] = {
     case req @ POST -> Root asAuthed _ =>
       val action =
         for {
-          category <- req.request.as[CourseCategory]
+          data <- req.request.as[CourseCategoryRequest]
+          category = CourseCategory(title = data.title)
           createdCourseCategory <-
             courseCategoryService.createCourseCategory(category).value
         } yield createdCourseCategory
@@ -50,17 +54,17 @@ class CourseCategoryEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
 
   }
 
-  private def updateCourseCategoryEndpoint(
-      courseCategoryService: CourseCategoryService[F]
-  ): AuthEndpoint[F, Auth] = {
-    case req @ POST -> Root / LongVar(id) asAuthed _ =>
+  private def updateCourseCategoryEndpoint(): AuthEndpoint[F, Auth] = {
+    case req @ PUT -> Root / LongVar(id) asAuthed _ =>
       courseCategoryService.getCourseCategory(id).value.flatMap {
-        case Right(_) =>
+        case Right(category) =>
           val action =
             for {
-              courseCategory <- req.request.as[CourseCategory]
+              data <- req.request.as[CourseCategoryRequest]
               res <-
-                courseCategoryService.updateCourseCategory(courseCategory).value
+                courseCategoryService
+                  .updateCourseCategory(category.copy(title = data.title))
+                  .value
             } yield res
 
           action.flatMap {
@@ -72,9 +76,7 @@ class CourseCategoryEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
       }
   }
 
-  private def deleteCourseCategoryEndpoint(
-      courseCategoryService: CourseCategoryService[F]
-  ): AuthEndpoint[F, Auth] = {
+  private def deleteCourseCategoryEndpoint(): AuthEndpoint[F, Auth] = {
     case DELETE -> Root / LongVar(id) asAuthed _ =>
       for {
         _ <- courseCategoryService.deleteCourseCategory(id)
@@ -82,30 +84,40 @@ class CourseCategoryEndpoints[F[_]: Sync, Auth: JWTMacAlgo]
       } yield resp
   }
 
-  def listCourseCategoriesEndpoint(
-      courseCategoryService: CourseCategoryService[F]
-  ): AuthEndpoint[F, Auth] = {
+  def listCourseCategoriesEndpoint: AuthEndpoint[F, Auth] = {
     case GET -> Root :? OptionalPageSizeMatcher(
           pageSize
         ) :? OptionalOffsetMatcher(offset) asAuthed _ =>
       for {
         retrieved <- courseCategoryService.listCourseCategories(
           pageSize.getOrElse(10),
-          offset.getOrElse(10)
+          offset.getOrElse(0)
         )
         resp <- Ok(retrieved.asJson)
       } yield resp
   }
 
   def endpoints(
-      courseCategoryService: CourseCategoryService[F],
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] = {
+//    val authEndpoints: AuthService[F, Auth] = {
+//      Auth.allRoles {
+//        updateCourseCategoryEndpoint()
+//          .orElse(deleteCourseCategoryEndpoint())
+//          .orElse(listCourseCategoriesEndpoint)
+//      }
+//    }
+//    val adminAuthEndpoints = Auth.adminOnly {
+//      createCourseCategoryEndpoint()
+//    }
+//    auth.liftService(adminAuthEndpoints) <+> auth.liftService(authEndpoints)
+
     val authEndpoints: AuthService[F, Auth] = {
       Auth.allRoles {
-        createCourseCategoryEndpoint(courseCategoryService)
-          .orElse(updateCourseCategoryEndpoint(courseCategoryService))
-          .orElse(deleteCourseCategoryEndpoint(courseCategoryService))
+        updateCourseCategoryEndpoint()
+          .orElse(deleteCourseCategoryEndpoint())
+          .orElse(listCourseCategoriesEndpoint)
+          .orElse(createCourseCategoryEndpoint())
       }
     }
     auth.liftService(authEndpoints)
@@ -117,5 +129,5 @@ object CourseCategoryEndpoints {
       courseCategoryService: CourseCategoryService[F],
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] =
-    new CourseCategoryEndpoints[F, Auth].endpoints(courseCategoryService, auth)
+    new CourseCategoryEndpoints[F, Auth](courseCategoryService).endpoints(auth)
 }

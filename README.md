@@ -25,14 +25,26 @@ We are using:
 - [Cats](https://typelevel.org/cats/) - FP data structures
 - [Circe Config](https://github.com/circe/circe-config) - for app config
 - [Scala Check](https://www.scalacheck.org/) - for property based testing
-- Tagless Final 
+- PostgreSQL - as a main database
+- Tagless Final: For the core domain
 
 ### Onion Architectural Pattern:
 The project is being made following up [Onion Architectural design](https://medium.com/@shivendraodean/software-architecture-the-onion-architecture-1b235bec1dec#:~:text=The%20Onion%20Architecture%20is%20an,at%20a%20Solution%2FSystem%20level.) principles.
 Using this approach we are decoupling our application modules into separate parts:
-`todo1: insert graph of arch`
 
+We are combining DDD with Onion together through following mechanisms:
+
+**Domain package**. We tried to keep by dividing our modules in reasonable way. 
+We use `Services` as straight forward interface to our domain. You can see quite a lot of boiler plate related to CRUD 
+operations. We tried to keep one to one mapping between our `Services` and `Endpoints`.
+
+In the domain module you will find following concepts:
+1. `Service` - serves. Use cases that work with other domain conpets to realise your use-cases
+2. `Repository` - ways to access to the data. 
+3. `Models` - stuff like `classes`, `lessons`, `Student Profile` and many many more... All the behaviour comes using `Validation`
+and `Services`
 #### Modules:
+- **Controllers**: Handle the logic of the incoming requests to our endpoints
 - **Domain**: Module where we describe the core business logic. It consists of following:
     - Authentication - helps with authentication
     - Courses - course back-end logics, with related entities
@@ -40,12 +52,12 @@ Using this approach we are decoupling our application modules into separate part
     - Results - helper module, consists of entities which needed to evaluate Students' performance
     - Schedule - scheduling service that helps to students to choose the Classes
     - Users - has user, teacher, student services 
-- **Infrastructure**: Module where we describe the endpoints and db operating functions
-- **Configuration**: Module where we describe configurations of the app(which db to use, on which ports to run the server, etc.)
+- **Infrastructure**: contains the HTTP endpoints that we surface via http4s. You will also typically see JSON things in here via circe
+- **Configuration**:  contains the JDBC code, implementations of our Repositories. We have 2 implementations, an in-memory version as well as a doobie version.
 
-`todo2: insert the detailed description of each module`
+The config package The config package could be considered infrastructure, as it has nothing to do with the domain. We use Circe Config to load configuration objects when the application starts up. circe config Provides a neat mapping of config file to case classes for us, so we really do not have to do any code.
 
-#### DataBase scheme:
+### DataBase scheme:
 You can observe the scheme in the following [link](https://drive.google.com/file/d/1sknFvJ0BTB3cFnHtQf6PakkdaXu1NTkh/view?usp=sharing)
 
 
@@ -76,6 +88,8 @@ Application preruns the written into `test` package tests on gitlab CI/CD
 
 In the test module of the applicaiton we are running tests basing on the 
 
+Application tests cover the endpoints behaviour of the application.
+It consists of typical command to see whether the services function as supposed to be.
 
 
 

@@ -64,12 +64,12 @@ class EnrollmentEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
       enrollmentService: EnrollmentService[F],
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] = {
-    val teacherAuthEndpoints: AuthService[F, Auth] =
+    val authEndpoints: AuthService[F, Auth] =
       Auth.allRoles {
         enrollEndpoint(enrollmentService)
           .orElse(deleteEnrollmentEndpoint(enrollmentService))
       }
-    auth.liftService(teacherAuthEndpoints)
+    auth.liftService(authEndpoints)
   }
 
 }

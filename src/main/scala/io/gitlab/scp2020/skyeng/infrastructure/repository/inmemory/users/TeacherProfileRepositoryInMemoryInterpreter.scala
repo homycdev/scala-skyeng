@@ -3,13 +3,18 @@ package io.gitlab.scp2020.skyeng.infrastructure.repository.inmemory.users
 import cats.Applicative
 import cats.data.OptionT
 import cats.implicits.catsSyntaxApplicativeId
-import io.gitlab.scp2020.skyeng.domain.users.teacher.{TeacherProfile, TeacherProfileRepositoryAlgebra}
+import io.gitlab.scp2020.skyeng.domain.users.teacher.{
+  TeacherProfile,
+  TeacherProfileRepositoryAlgebra
+}
+import tsec.authentication.IdentityStore
 
 import scala.collection.concurrent.TrieMap
 import scala.util.Random
 
 class TeacherProfileRepositoryInMemoryInterpreter[F[_]: Applicative]
-    extends TeacherProfileRepositoryAlgebra[F] {
+    extends TeacherProfileRepositoryAlgebra[F]
+    with IdentityStore[F, Long, TeacherProfile] {
   private val cache = new TrieMap[Long, TeacherProfile]
 
   private val random = new Random
@@ -22,7 +27,13 @@ class TeacherProfileRepositoryInMemoryInterpreter[F[_]: Applicative]
   }
 
   def update(teacher: TeacherProfile): OptionT[F, TeacherProfile] = {
-      OptionT.liftF(teacher.copy(bio = teacher.bio, greeting = teacher.greeting, qualification = teacher.qualification).pure[F])
+    val toSave = teacher.copy(
+      bio = teacher.bio,
+      greeting = teacher.greeting,
+      qualification = teacher.qualification
+    )
+    cache.update(teacher.userId, toSave)
+    OptionT.liftF(toSave.pure[F])
   }
 
   def get(id: Long): OptionT[F, TeacherProfile] =

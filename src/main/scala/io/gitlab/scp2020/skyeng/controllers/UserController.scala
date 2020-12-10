@@ -6,7 +6,8 @@ import cats.syntax.all._
 import io.circe.generic.auto._
 import io.gitlab.scp2020.skyeng.domain.authentication.{
   LoginRequest,
-  SignupRequest
+  SignupRequest,
+  UpdateRequest
 }
 import io.gitlab.scp2020.skyeng.domain.users.{User, UserService}
 import io.gitlab.scp2020.skyeng.domain.{
@@ -30,6 +31,7 @@ class UserController[F[_]: Sync, A, Auth: JWTMacAlgo](
   implicit val userDecoder: EntityDecoder[F, User] = jsonOf
   implicit val loginReqDecoder: EntityDecoder[F, LoginRequest] = jsonOf
   implicit val signupReqDecoder: EntityDecoder[F, SignupRequest] = jsonOf
+  implicit val updateReqDec: EntityDecoder[F, UpdateRequest] = jsonOf
 
   def login(
       request: Request[F]
@@ -80,13 +82,20 @@ class UserController[F[_]: Sync, A, Auth: JWTMacAlgo](
       request: SecuredRequest[F, User, AugmentedJWT[Auth, Long]],
       name: String
   ): F[Either[UserNotFoundError.type, User]] = {
-    val action = for {
-      user <- request.request.as[User]
-      updated = user.copy(userName = name)
-      result <- userService.update(updated).value
-    } yield result
+    val findUser = for {
+      user <- userService.getUserByName(name).value
+    } yield user
 
-    action
+    findUser.flatMap {
+      case Right(user) =>
+        for {
+          req <- request.request.as[UpdateRequest]
+          updatable = req.asUser(user)
+          result <- userService.update(updatable).value
+        } yield result
+      case Left(UserNotFoundError) =>
+        findUser
+    }
   }
 
   def list(

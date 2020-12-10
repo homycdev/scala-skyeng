@@ -26,13 +26,13 @@ import tsec.jwt.algorithms.JWTMacAlgo
 
 import java.time.LocalDateTime
 
-class PaymentEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
+class PaymentEndpoints[F[_]: Sync, Auth: JWTMacAlgo](
+    transactionService: TransactionService[F],
+    studentProfileService: StudentProfileService[F]
+) extends Http4sDsl[F] {
   implicit val replenishDecoder: EntityDecoder[F, ReplenishRequest] = jsonOf
 
-  private def replenishBalanceEndpoint(
-      transactionService: TransactionService[F],
-      studentProfileService: StudentProfileService[F]
-  ): AuthEndpoint[F, Auth] = {
+  private def replenishBalanceEndpoint(): AuthEndpoint[F, Auth] = {
     case req @ POST -> Root / "replenish" asAuthed user =>
       studentProfileService.getStudent(user.id.get).value.flatMap {
         case Right(student) =>
@@ -79,10 +79,7 @@ class PaymentEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
       }
   }
 
-  private def lessonPassedEndpoint(
-      transactionService: TransactionService[F],
-      studentProfileService: StudentProfileService[F]
-  ): AuthEndpoint[F, Auth] = {
+  private def lessonPassedEndpoint(): AuthEndpoint[F, Auth] = {
     case _ @POST -> Root / "lesson_passed" / LongVar(studentId) asAuthed _ =>
       studentProfileService.getStudent(studentId).value.flatMap {
         case Right(student) =>
@@ -122,10 +119,7 @@ class PaymentEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
       }
   }
 
-  def listStudentTransactionsEndpoint(
-      transactionService: TransactionService[F],
-      studentProfileService: StudentProfileService[F]
-  ): AuthEndpoint[F, Auth] = {
+  def listStudentTransactionsEndpoint: AuthEndpoint[F, Auth] = {
     case GET -> Root / "transactions" asAuthed user =>
       studentProfileService.getStudent(user.id.get).value.flatMap {
         case Right(student) =>
@@ -140,29 +134,30 @@ class PaymentEndpoints[F[_]: Sync, Auth: JWTMacAlgo] extends Http4sDsl[F] {
   }
 
   def endpoints(
-      transactionService: TransactionService[F],
-      studentProfileService: StudentProfileService[F],
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] = {
-    val studentAuthEndpoints: AuthService[F, Auth] = {
-      Auth.studentOnly {
-        replenishBalanceEndpoint(transactionService, studentProfileService)
-          .orElse(
-            listStudentTransactionsEndpoint(
-              transactionService,
-              studentProfileService
-            )
-          )
+//    val studentAuthEndpoints: AuthService[F, Auth] = {
+//      Auth.studentOnly {
+//        replenishBalanceEndpoint()
+//          .orElse(
+//            listStudentTransactionsEndpoint
+//          )
+//      }
+//    }
+//    val teacherAuthEndpoints: AuthService[F, Auth] = {
+//      Auth.teacherOnly {
+//        lessonPassedEndpoint()
+//      }
+//    }
+//    auth.liftService(studentAuthEndpoints) <+> auth.liftService(teacherAuthEndpoints)
+    val authEndpoints: AuthService[F, Auth] = {
+      Auth.allRoles {
+        replenishBalanceEndpoint()
+          .orElse(listStudentTransactionsEndpoint)
+          .orElse(lessonPassedEndpoint())
       }
     }
-    val teacherAuthEndpoints: AuthService[F, Auth] = {
-      Auth.teacherOnly {
-        lessonPassedEndpoint(transactionService, studentProfileService)
-      }
-    }
-    auth.liftService(studentAuthEndpoints) <+> auth.liftService(
-      teacherAuthEndpoints
-    )
+    auth.liftService(authEndpoints)
   }
 }
 
@@ -172,6 +167,6 @@ object PaymentEndpoints {
       studentProfileService: StudentProfileService[F],
       auth: SecuredRequestHandler[F, Long, User, AugmentedJWT[Auth, Long]]
   ): HttpRoutes[F] =
-    new PaymentEndpoints[F, Auth]
-      .endpoints(transactionService, studentProfileService, auth)
+    new PaymentEndpoints[F, Auth](transactionService, studentProfileService)
+      .endpoints(auth)
 }
