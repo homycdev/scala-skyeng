@@ -94,7 +94,7 @@ It consists of typical command to see whether the services function as supposed 
 All tests related to the endpoints that app provides to manipulate with the services.
 
 ## User manual
-For the better experience you should download the Postman to make following request. 
+For the better experience you should download the [Postman](https://www.postman.com/downloads/) to make following request. 
 
 Please, make sure that you have running server.
 
