@@ -103,7 +103,7 @@ API to import into Postman: [API](https://gitlab.com/homycdev/scala-courseprojec
 
 #### Sample requests
 | Desc      | Verb | Route |
-| ----------- | ----------- |
+| ----------- | ----------- | --------- |
 | Create user | POST | `/user` |
 | Find user under certain ID   | GET        | `/user/{id}` |
 | Delete user from the system | DELETE | `/user/{id}`|
