@@ -101,8 +101,14 @@ Please, make sure that you have running server.
 API to import into Postman: [API](https://gitlab.com/homycdev/scala-courseproject2020/-/blob/master/API.json)
 
 
-
-
+#### Sample requests
+| Desc      | Verb | Route |
+| ----------- | ----------- |
+| Create user | POST | `/user` |
+| Find user under certain ID   | GET        | `/user/{id}` |
+| Delete user from the system | DELETE | `/user/{id}`|
+| Create Course | POST | `/course`|
+| Get course under certain ID| GET | `/course/{id}` |
 
 
 
