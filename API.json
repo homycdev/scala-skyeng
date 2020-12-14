@@ -1,0 +1,2235 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0",
+    "title": "SkyengDB",
+    "contact": {}
+  },
+  "host": "0.0.0.0:8080",
+  "basePath": "/",
+  "securityDefinitions": {},
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/user": {
+      "post": {
+        "summary": "Create User",
+        "tags": [
+          "/user"
+        ],
+        "operationId": "CreateUser",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/CreateUserRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/user/login": {
+      "post": {
+        "summary": "Login In the system",
+        "tags": [
+          "/user"
+        ],
+        "operationId": "LoginInthesystem",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/LoginInthesystemRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/user/studentOne": {
+      "put": {
+        "summary": "Update user",
+        "tags": [
+          "/user"
+        ],
+        "operationId": "Updateuser",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UpdateuserRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete user",
+        "tags": [
+          "/user"
+        ],
+        "operationId": "Deleteuser",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/user/testUser6": {
+      "get": {
+        "summary": "Get user",
+        "tags": [
+          "/user"
+        ],
+        "operationId": "Getuser",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/teacher/update/22": {
+      "post": {
+        "summary": "Get Teacher Profile",
+        "tags": [
+          "/teacher"
+        ],
+        "operationId": "GetTeacherProfile",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/GetTeacherProfileRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "Update Teacher Profile",
+        "tags": [
+          "/teacher"
+        ],
+        "operationId": "UpdateTeacherProfile",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/teacher": {
+      "get": {
+        "summary": "List Teacher Profiles",
+        "tags": [
+          "/teacher"
+        ],
+        "operationId": "ListTeacherProfiles",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "2",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/teacher/room": {
+      "get": {
+        "summary": "Get Room of Teacher (teacher only)",
+        "tags": [
+          "/teacher"
+        ],
+        "operationId": "GetRoomofTeacher(teacheronly)",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/teacher/room/open/{ID}": {
+      "post": {
+        "summary": "Set Room Open (teacher only)",
+        "tags": [
+          "/teacher"
+        ],
+        "operationId": "SetRoomOpen(teacheronly)",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "ID",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/teacher/room/close/{Id}": {
+      "post": {
+        "summary": "Set Room Closed (teacher only)",
+        "tags": [
+          "/teacher"
+        ],
+        "operationId": "SetRoomClosed(teacheronly)",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/student/28": {
+      "get": {
+        "summary": "Get Student",
+        "tags": [
+          "/student"
+        ],
+        "operationId": "GetStudent",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      },
+      "put": {
+        "summary": "Chage Teacher of Student Profile (student only)",
+        "tags": [
+          "/student"
+        ],
+        "operationId": "ChageTeacherofStudentProfile(studentonly)",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ChageTeacherofStudentProfile%28studentonly%29Request"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/student/id": {
+      "delete": {
+        "summary": "Delete Student (admin only)",
+        "tags": [
+          "/student"
+        ],
+        "operationId": "DeleteStudent(adminonly)",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/student/room": {
+      "get": {
+        "summary": "Get Room of Student",
+        "tags": [
+          "/student"
+        ],
+        "operationId": "GetRoomofStudent",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/schedule": {
+      "post": {
+        "summary": "Create Schedule",
+        "tags": [
+          "schedule"
+        ],
+        "operationId": "CreateSchedule",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/CreateScheduleRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      },
+      "get": {
+        "summary": "Get Schedule of Student",
+        "tags": [
+          "schedule"
+        ],
+        "operationId": "GetScheduleofStudent",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/schedule/1": {
+      "post": {
+        "summary": "Update Schedule",
+        "tags": [
+          "schedule"
+        ],
+        "operationId": "UpdateSchedule",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UpdateScheduleRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Schedule",
+        "tags": [
+          "schedule"
+        ],
+        "operationId": "DeleteSchedule",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/result/\"exercise\"/1": {
+      "post": {
+        "summary": "Create Result",
+        "tags": [
+          "results"
+        ],
+        "operationId": "CreateResult",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/CreateResultRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      },
+      "get": {
+        "summary": "Get Result",
+        "tags": [
+          "results"
+        ],
+        "operationId": "GetResult",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/result/exercise/1": {
+      "put": {
+        "summary": "Update Result",
+        "tags": [
+          "results"
+        ],
+        "operationId": "UpdateResult",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UpdateResultRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/payment/replenish": {
+      "post": {
+        "summary": "Replenish Balance (student only)",
+        "tags": [
+          "payment"
+        ],
+        "operationId": "ReplenishBalance(studentonly)",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ReplenishBalance%28studentonly%29Request"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/payment/lesson_passed/1": {
+      "post": {
+        "summary": "Lesson Passed",
+        "tags": [
+          "payment"
+        ],
+        "operationId": "LessonPassed",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/payment/transactions": {
+      "get": {
+        "summary": "List Student Transaction",
+        "tags": [
+          "payment"
+        ],
+        "operationId": "ListStudentTransaction",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/course_category": {
+      "post": {
+        "summary": "Create Course Category (admin only)",
+        "tags": [
+          "/course_category"
+        ],
+        "operationId": "CreateCourseCategory(adminonly)",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/CreateCourseCategory%28adminonly%29Request"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      },
+      "get": {
+        "summary": "List Course Categories",
+        "tags": [
+          "/course_category"
+        ],
+        "operationId": "ListCourseCategories",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/course_category/1": {
+      "put": {
+        "summary": "Update Course Category (admin only)",
+        "tags": [
+          "/course_category"
+        ],
+        "operationId": "UpdateCourseCategory(adminonly)",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UpdateCourseCategory%28adminonly%29Request"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Course Category (admin only)",
+        "tags": [
+          "/course_category"
+        ],
+        "operationId": "DeleteCourseCategory(adminonly)",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/course": {
+      "post": {
+        "summary": "Create Course",
+        "tags": [
+          "/course"
+        ],
+        "operationId": "CreateCourse",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/CreateCourseRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      },
+      "get": {
+        "summary": "List Courses",
+        "tags": [
+          "/course"
+        ],
+        "operationId": "ListCourses",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/course/id": {
+      "put": {
+        "summary": "Update Course",
+        "tags": [
+          "/course"
+        ],
+        "operationId": "UpdateCourse",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UpdateCourseRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Course",
+        "tags": [
+          "/course"
+        ],
+        "operationId": "DeleteCourse",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/enroll/": {
+      "post": {
+        "summary": "Enroll to Course",
+        "tags": [
+          "/enrollment"
+        ],
+        "operationId": "EnrolltoCourse",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/EnrolltoCourseRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/enroll/id": {
+      "delete": {
+        "summary": "Update Enrollment",
+        "tags": [
+          "/enrollment"
+        ],
+        "operationId": "UpdateEnrollment",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/homework/": {
+      "post": {
+        "summary": "Create Homework",
+        "tags": [
+          "/homework"
+        ],
+        "operationId": "CreateHomework",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/CreateHomeworkRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/homework/1": {
+      "get": {
+        "summary": "Search Homework",
+        "tags": [
+          "/homework"
+        ],
+        "operationId": "SearchHomework",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Homework",
+        "tags": [
+          "/homework"
+        ],
+        "operationId": "DeleteHomework",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/homework": {
+      "get": {
+        "summary": "List Homeworks",
+        "tags": [
+          "/homework"
+        ],
+        "operationId": "ListHomeworks",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/lesson": {
+      "post": {
+        "summary": "Create Lesson",
+        "tags": [
+          "/lesson"
+        ],
+        "operationId": "CreateLesson",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/CreateLessonRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      },
+      "get": {
+        "summary": "List Lessons",
+        "tags": [
+          "/lesson"
+        ],
+        "operationId": "ListLessons",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/lesson/update/1": {
+      "post": {
+        "summary": "Update Lesson",
+        "tags": [
+          "/lesson"
+        ],
+        "operationId": "UpdateLesson",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UpdateLessonRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/lesson/1": {
+      "delete": {
+        "summary": "Delete Lesson",
+        "tags": [
+          "/lesson"
+        ],
+        "operationId": "DeleteLesson",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      },
+      "get": {
+        "summary": "Get Lesson",
+        "tags": [
+          "/lesson"
+        ],
+        "operationId": "GetLesson",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/exercise": {
+      "post": {
+        "summary": "Create Exercise",
+        "tags": [
+          "/exercise"
+        ],
+        "operationId": "CreateExercise",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/CreateExerciseRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/exercise/1": {
+      "delete": {
+        "summary": "Delete Exercise",
+        "tags": [
+          "/exercise"
+        ],
+        "operationId": "DeleteExercise",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      },
+      "get": {
+        "summary": "Get Exercise",
+        "tags": [
+          "/exercise"
+        ],
+        "operationId": "GetExercise",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/task/1": {
+      "delete": {
+        "summary": "Delete  Task",
+        "tags": [
+          "/task"
+        ],
+        "operationId": "DeleteTask",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      },
+      "get": {
+        "summary": "Get Task",
+        "tags": [
+          "/task"
+        ],
+        "operationId": "GetTask",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/task": {
+      "post": {
+        "summary": "Create Task",
+        "tags": [
+          "/task"
+        ],
+        "operationId": "CreateTask",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/CreateTaskRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      },
+      "get": {
+        "summary": "List Tasks",
+        "tags": [
+          "/task"
+        ],
+        "operationId": "ListTasks",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "CreateUserRequest": {
+      "title": "CreateUserRequest",
+      "example": {
+        "userName": "teacher3",
+        "firstName": "Teacher3",
+        "lastName": "Ya posle decouplings heh",
+        "birthDate": "",
+        "gender": "",
+        "email": "test@test.com",
+        "password": "testpassword",
+        "phone": "",
+        "role": "teacher"
+      },
+      "type": "object",
+      "properties": {
+        "userName": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "birthDate": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "userName",
+        "firstName",
+        "lastName",
+        "birthDate",
+        "gender",
+        "email",
+        "password",
+        "phone",
+        "role"
+      ]
+    },
+    "LoginInthesystemRequest": {
+      "title": "LoginInthesystemRequest",
+      "example": {
+        "userName": "admin",
+        "password": "testpassword"
+      },
+      "type": "object",
+      "properties": {
+        "userName": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "userName",
+        "password"
+      ]
+    },
+    "UpdateuserRequest": {
+      "title": "UpdateuserRequest",
+      "example": {
+        "userName": "updatedUser",
+        "firstName": "",
+        "lastName": "",
+        "birthDate": "",
+        "gender": "",
+        "email": "newemail@test.com"
+      },
+      "type": "object",
+      "properties": {
+        "userName": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "birthDate": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "userName",
+        "firstName",
+        "lastName",
+        "birthDate",
+        "gender",
+        "email"
+      ]
+    },
+    "GetTeacherProfileRequest": {
+      "title": "GetTeacherProfileRequest",
+      "example": {
+        "userId": 22,
+        "bio": "Ja , a umniy",
+        "greeting": "Nu kak vi, potomoki? Ya upnulsya",
+        "qualification": "not_native_speaker"
+      },
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "bio": {
+          "type": "string"
+        },
+        "greeting": {
+          "type": "string"
+        },
+        "qualification": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "userId",
+        "bio",
+        "greeting",
+        "qualification"
+      ]
+    },
+    "ChageTeacherofStudentProfile(studentonly)Request": {
+      "title": "ChageTeacherofStudentProfile(studentonly)Request",
+      "example": {
+        "teacherId": 31
+      },
+      "type": "object",
+      "properties": {
+        "teacherId": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "teacherId"
+      ]
+    },
+    "CreateScheduleRequest": {
+      "title": "CreateScheduleRequest",
+      "example": {
+        "id": 1,
+        "studentId": 28,
+        "teacherId": 29,
+        "startTime": "time",
+        "durationSec": 20
+      },
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "studentId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "teacherId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "startTime": {
+          "type": "string"
+        },
+        "durationSec": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "id",
+        "studentId",
+        "teacherId",
+        "startTime",
+        "durationSec"
+      ]
+    },
+    "UpdateScheduleRequest": {
+      "title": "UpdateScheduleRequest",
+      "example": {
+        "id": 1,
+        "studentId": 1,
+        "teacherId": 1,
+        "startTime": "time",
+        "durationSec": 20
+      },
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "studentId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "teacherId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "startTime": {
+          "type": "string"
+        },
+        "durationSec": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "id",
+        "studentId",
+        "teacherId",
+        "startTime",
+        "durationSec"
+      ]
+    },
+    "CreateResultRequest": {
+      "title": "CreateResultRequest",
+      "example": {
+        "content": {}
+      },
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "content"
+      ]
+    },
+    "UpdateResultRequest": {
+      "title": "UpdateResultRequest",
+      "example": {
+        "content": {}
+      },
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "content"
+      ]
+    },
+    "ReplenishBalance(studentonly)Request": {
+      "title": "ReplenishBalance(studentonly)Request",
+      "example": {
+        "amount": 1000
+      },
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "amount"
+      ]
+    },
+    "CreateCourseCategory(adminonly)Request": {
+      "title": "CreateCourseCategory(adminonly)Request",
+      "example": {
+        "title": "New Category"
+      },
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "title"
+      ]
+    },
+    "UpdateCourseCategory(adminonly)Request": {
+      "title": "UpdateCourseCategory(adminonly)Request",
+      "example": {
+        "title": "New Updated Title"
+      },
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "title"
+      ]
+    },
+    "CreateCourseRequest": {
+      "title": "CreateCourseRequest",
+      "example": {
+        "title": "Brand New Course",
+        "categoryId": 1
+      },
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "categoryId": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "title",
+        "categoryId"
+      ]
+    },
+    "UpdateCourseRequest": {
+      "title": "UpdateCourseRequest",
+      "example": {
+        "title": "Updated title",
+        "categoryId": 2
+      },
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "categoryId": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "title",
+        "categoryId"
+      ]
+    },
+    "EnrolltoCourseRequest": {
+      "title": "EnrolltoCourseRequest",
+      "example": {
+        "id": 1,
+        "studentId": 1,
+        "courseId": 1
+      },
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "studentId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "courseId": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "id",
+        "studentId",
+        "courseId"
+      ]
+    },
+    "CreateHomeworkRequest": {
+      "title": "CreateHomeworkRequest",
+      "example": {
+        "id": 1,
+        "title": "Homework",
+        "courseId": 12,
+        "lessonId": 12,
+        "difficulty": "advanced",
+        "listPosition": 1
+      },
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "title": {
+          "type": "string"
+        },
+        "courseId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "lessonId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "difficulty": {
+          "type": "string"
+        },
+        "listPosition": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "courseId",
+        "lessonId",
+        "difficulty",
+        "listPosition"
+      ]
+    },
+    "CreateLessonRequest": {
+      "title": "CreateLessonRequest",
+      "example": {
+        "id": 1,
+        "title": "Lesson one",
+        "courseId": 1,
+        "difficulty": "advanced",
+        "listPosition": 2
+      },
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "title": {
+          "type": "string"
+        },
+        "courseId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "difficulty": {
+          "type": "string"
+        },
+        "listPosition": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "courseId",
+        "difficulty",
+        "listPosition"
+      ]
+    },
+    "UpdateLessonRequest": {
+      "title": "UpdateLessonRequest",
+      "example": {
+        "id": 1,
+        "title": "Lesson one",
+        "courseId": 1,
+        "difficulty": "advanced",
+        "listPosition": 2
+      },
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "title": {
+          "type": "string"
+        },
+        "courseId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "difficulty": {
+          "type": "string"
+        },
+        "listPosition": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "courseId",
+        "difficulty",
+        "listPosition"
+      ]
+    },
+    "CreateExerciseRequest": {
+      "title": "CreateExerciseRequest",
+      "example": {
+        "id": 1,
+        "taskId": 1,
+        "exerciseType": "match",
+        "content": {}
+      },
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "taskId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "exerciseType": {
+          "type": "string"
+        },
+        "content": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "taskId",
+        "exerciseType",
+        "content"
+      ]
+    },
+    "CreateTaskRequest": {
+      "title": "CreateTaskRequest",
+      "example": {
+        "id": 1,
+        "classId": 1,
+        "taskType": "grammar",
+        "listPosition": 1
+      },
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "classId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "taskType": {
+          "type": "string"
+        },
+        "listPosition": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "id",
+        "classId",
+        "taskType",
+        "listPosition"
+      ]
+    }
+  },
+  "tags": [
+    {
+      "name": "/user"
+    },
+    {
+      "name": "/teacher"
+    },
+    {
+      "name": "/student"
+    },
+    {
+      "name": "schedule"
+    },
+    {
+      "name": "results"
+    },
+    {
+      "name": "payment"
+    },
+    {
+      "name": "/course_category"
+    },
+    {
+      "name": "/course"
+    },
+    {
+      "name": "/enrollment"
+    },
+    {
+      "name": "/homework"
+    },
+    {
+      "name": "/lesson"
+    },
+    {
+      "name": "/exercise"
+    },
+    {
+      "name": "/task"
+    }
+  ]
+}
