@@ -91,7 +91,14 @@ In the test module of the applicaiton we are running tests basing on the
 Application tests cover the endpoints behaviour of the application.
 It consists of typical command to see whether the services function as supposed to be.
 
+All tests related to the endpoints that app provides to manipulate with the services.
 
+## User manual
+For the better experience you should download the Postman to make following request. 
+
+Please, make sure that you have running server.
+
+API to import into Postman: [API](https://gitlab.com/homycdev/scala-courseproject2020/-/blob/master/API.json)
 
 
 
