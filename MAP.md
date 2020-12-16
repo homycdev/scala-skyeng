@@ -14,7 +14,7 @@ A lot of fixes had been introduced, which is good. Tells that project is being r
 **ToFix:** Nothing to fix.
 
 
-## Report from product owners on Sprint1 & Sprint 2
+## Report from product owners on Sprint2 & Sprint 3
 _-"Very nice. MVP had been providen. All features function as they supposed to be. The way how organisation of the development went is very good. Issues are neat and clear to understand. Code was written ok. Tests are fine."_
 
 ## Link to web diagram 
